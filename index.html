@@ -10,7 +10,415 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,640&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/styles.css">
+  <style>
+:root {
+  --ink: #17241c;
+  --ink-soft: #4d5c53;
+  --green: #0e3b2e;
+  --green-deep: #08261d;
+  --green-mid: #1d5c45;
+  --gold: #b8893d;
+  --gold-soft: #e7d3a4;
+  --paper: #f4efe6;
+  --card: #fffcf8;
+  --line: #e3d8c6;
+  --danger: #8c2f2f;
+  --shadow: 0 18px 50px rgba(20, 40, 30, 0.08);
+  --serif: Fraunces, "Iowan Old Style", Palatino, "Palatino Linotype", serif;
+  --sans: Outfit, "Segoe UI", sans-serif;
+  --radius: 18px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 16.5px;
+  line-height: 1.55;
+  background:
+    radial-gradient(900px 420px at 0% -10%, rgba(184, 137, 61, 0.16), transparent 55%),
+    var(--paper);
+}
+img { max-width: 100%; }
+button, input, select, textarea { font: inherit; color: inherit; }
+a { color: inherit; }
+
+.skip {
+  position: absolute;
+  left: 12px;
+  top: -40px;
+  background: white;
+  padding: 8px 12px;
+  z-index: 50;
+}
+.skip:focus { top: 12px; }
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 7vw;
+  background: var(--green);
+  color: #f7f3ea;
+  border-bottom: 3px solid var(--gold);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  min-width: 220px;
+}
+.crest {
+  width: 46px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(#f3e6c4, #d7b56a);
+  color: var(--green-deep);
+  font-family: var(--serif);
+  font-weight: 620;
+  letter-spacing: 0.04em;
+  clip-path: polygon(50% 0, 100% 16%, 88% 78%, 50% 100%, 12% 78%, 0 16%);
+}
+.brand strong {
+  display: block;
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+.brand em {
+  display: block;
+  margin-top: 3px;
+  font-style: normal;
+  font-size: 0.75rem;
+  letter-spacing: 0.02em;
+  color: var(--gold-soft);
+}
+.nav-toggle {
+  display: none;
+  border: 1px solid rgba(247, 243, 234, 0.35);
+  background: transparent;
+  color: #f7f3ea;
+  border-radius: 999px;
+  padding: 8px 12px;
+}
+.site-nav { display: flex; align-items: center; gap: 8px; }
+.site-nav a {
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #f3ecdf;
+  font-size: 0.95rem;
+}
+.site-nav a[aria-current="page"],
+.site-nav a:hover { background: rgba(255, 255, 255, 0.1); }
+.nav-cta {
+  background: var(--gold) !important;
+  color: var(--green-deep) !important;
+  font-weight: 600;
+}
+
+.wrap { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+.hero {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 42px;
+  align-items: center;
+  padding: 64px 0 36px;
+}
+.kicker {
+  margin: 0 0 10px;
+  color: var(--gold);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+h1, h2, h3 { font-family: var(--serif); font-weight: 560; letter-spacing: -0.03em; }
+h1 { font-size: clamp(2.6rem, 5vw, 4.6rem); line-height: 0.96; margin: 0 0 16px; }
+h2 { font-size: clamp(1.8rem, 3vw, 2.6rem); margin: 0 0 10px; }
+h3 { margin: 0 0 8px; font-size: 1.35rem; }
+.lede { font-size: 1.12rem; color: var(--ink-soft); max-width: 46rem; }
+.hero-actions, .inline-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+.btn {
+  border: 0;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  padding: 12px 18px;
+  background: var(--green);
+  color: #f7f3ea;
+  font-weight: 600;
+}
+.btn:hover { background: var(--green-mid); }
+.btn-gold { background: var(--gold); color: #1d1608; }
+.btn-gold:hover { background: #c99a49; }
+.btn-ghost {
+  background: transparent;
+  color: var(--green);
+  box-shadow: inset 0 0 0 1.5px var(--green);
+}
+.btn-ghost:hover { background: rgba(14, 59, 46, 0.06); }
+.btn-small { padding: 8px 12px; font-size: 0.92rem; }
+.btn-danger { background: transparent; color: var(--danger); box-shadow: inset 0 0 0 1px #e3c1c1; }
+
+.hero-card, .card, .panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+.hero-card { padding: 22px; }
+.locked-preview { position: relative; overflow: hidden; }
+.locked-preview table { filter: blur(1.2px); opacity: 0.78; }
+.lock-note {
+  position: absolute;
+  inset: auto 16px 16px 16px;
+  background: rgba(8, 38, 29, 0.92);
+  color: #f7f3ea;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font-size: 0.92rem;
+}
+.mini-meta { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; color: var(--ink-soft); font-size: 0.92rem; }
+
+.trust {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding-bottom: 28px;
+}
+.trust div, .stat {
+  background: rgba(255, 252, 248, 0.72);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 14px;
+}
+.trust span, .stat span { display: block; color: var(--ink-soft); font-size: 0.82rem; }
+.trust strong, .stat strong { font-family: var(--serif); font-size: 1.25rem; }
+
+.section { padding: 28px 0 10px; }
+.section-head { max-width: 40rem; margin-bottom: 18px; }
+.grid-3, .grid-4, .grid-2 { display: grid; gap: 16px; }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-2 { grid-template-columns: 1.2fr 0.8fr; }
+.card { padding: 18px; }
+.card p, .panel p { color: var(--ink-soft); }
+.stream-card { border-top: 4px solid var(--stream, var(--green)); min-height: 180px; }
+.steps { counter-reset: step; }
+.steps article { position: relative; padding-top: 8px; }
+.steps article::before {
+  counter-increment: step;
+  content: counter(step);
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #f7f3ea;
+  font-weight: 650;
+  margin-bottom: 10px;
+}
+
+.site-footer {
+  margin-top: 48px;
+  padding: 28px 7vw 36px;
+  background: var(--green-deep);
+  color: #efe6d6;
+}
+.site-footer .wrap, .footer-grid { width: min(1120px, 100%); }
+.footer-grid { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+.site-footer a { color: var(--gold-soft); }
+.fine { color: var(--ink-soft); font-size: 0.92rem; }
+.site-footer .fine { color: #cbbfaa; }
+
+.page { padding: 36px 0 10px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); }
+.grade {
+  display: inline-grid;
+  place-items: center;
+  min-width: 42px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: #efe7d8;
+}
+.g-a { background: #d9efe4; color: #0e3b2e; }
+.g-b { background: #e5f0e4; color: #245c38; }
+.g-c { background: #f4ead0; color: #6d5314; }
+.g-d { background: #f8e4d4; color: #8a4b16; }
+.g-e { background: #f8dcdc; color: #8c2f2f; }
+.delta-up { color: #0e3b2e; font-weight: 700; }
+.delta-down { color: var(--danger); font-weight: 700; }
+.delta-flat { color: var(--ink-soft); font-weight: 700; }
+
+.login-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 22px;
+  align-items: start;
+}
+.panel { padding: 22px; }
+label { display: block; font-weight: 600; margin: 12px 0; }
+input, select, textarea {
+  width: 100%;
+  margin-top: 6px;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid #d9cdb8;
+  background: #fff;
+}
+textarea { min-height: 120px; resize: vertical; }
+.seg { display: flex; gap: 8px; margin: 8px 0 4px; }
+.seg button { flex: 1; }
+.seg button[aria-pressed="true"] { background: var(--green); color: white; box-shadow: none; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip {
+  border: 1px solid var(--line);
+  background: #fff;
+  border-radius: 999px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.chip:hover { border-color: var(--gold); }
+.error {
+  background: #fdecec;
+  color: var(--danger);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
+}
+.note {
+  background: #f7f1e4;
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.portal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+.who { color: var(--ink-soft); margin: 0; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.tabs button[aria-selected="true"] { background: var(--green); color: white; box-shadow: none; }
+.badge {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 99px;
+  background: var(--gold);
+  color: #1d1608;
+  font-size: 0.75rem;
+}
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 14px 0; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+.filters select, .filters input { width: auto; min-width: 160px; margin: 0; }
+.person {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+.click-row { cursor: pointer; }
+.click-row:hover { background: #faf6ef; }
+.timeline { display: grid; gap: 12px; margin-top: 8px; }
+.timeline article { display: grid; grid-template-columns: 92px 1fr; gap: 12px; align-items: center; }
+.year-mark {
+  font-family: var(--serif);
+  font-size: 1.4rem;
+  color: var(--green);
+}
+canvas.chart {
+  width: 100%;
+  background: linear-gradient(#fff, #fbf7f0);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+.messages {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 14px;
+  min-height: 420px;
+}
+.thread-list { display: flex; flex-direction: column; gap: 8px; }
+.thread-list button {
+  text-align: left;
+  border: 1px solid var(--line);
+  background: white;
+  border-radius: 14px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+.thread-list button[aria-pressed="true"] { border-color: var(--green); background: #f3faf6; }
+.thread-list small, .bubble small { color: var(--ink-soft); }
+.bubbles { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 14px; }
+.bubble {
+  max-width: min(640px, 100%);
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid var(--line);
+}
+.bubble.mine { margin-left: auto; background: #eef6f2; border-color: #d5e6dd; }
+.report-sheet { padding: 18px; }
+.signatures { display: flex; justify-content: space-between; gap: 24px; margin-top: 28px; }
+.signatures div { width: 220px; border-top: 1px solid var(--ink); padding-top: 6px; color: var(--ink-soft); font-size: 0.9rem; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+@media (max-width: 900px) {
+  .hero, .login-layout, .grid-3, .grid-4, .grid-2, .messages, .stats, .trust { grid-template-columns: 1fr; }
+  .trust { grid-template-columns: 1fr 1fr; }
+  .nav-toggle { display: inline-flex; }
+  .site-nav {
+    display: none;
+    position: absolute;
+    top: 74px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px 16px 16px;
+    background: var(--green-deep);
+  }
+  .site-nav.open { display: flex; }
+  .hide-sm { display: none; }
+  .timeline article { grid-template-columns: 1fr; }
+  .portal-head, .person { flex-direction: column; align-items: flex-start; }
+}
+
+@media print {
+  .site-header, .site-footer, .no-print, .tabs, .filters { display: none !important; }
+  body { background: white; }
+  .card, .panel, .report-sheet { box-shadow: none; }
+  .page { padding: 0; }
+}
+
+  </style>
 </head>
 <body>
   <a class="skip" href="#app">Skip to content</a>
@@ -47,7 +455,1342 @@
       <p class="fine">Parent and teacher portal for results, progress, and school communication.<br>Sample register for demonstration. Do not publish real student records in a public repository.</p>
     </div>
   </footer>
-  <script src="js/school.js"></script>
-  <script src="js/ui.js"></script>
+  <script>
+/* KBEST school register, results, and portal messages.
+   Sample records are generated in the browser so the site can run
+   on GitHub Pages with no server and no build step. */
+(function (root, factory) {
+  var api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.KBEST = api;
+  if (typeof process !== "undefined" && process.argv && process.argv.indexOf("--check") !== -1 && typeof module !== "undefined" && require.main === module) {
+    var school = api.getSchool();
+    var brian = api.studentByAdm("KBEST-4N-001");
+    var south = api.studentByAdm("KBEST-2S-010");
+    var east = api.studentByAdm("KBEST-1E-003");
+    var counts = {};
+    school.students.forEach(function (student) {
+      var key = student.form + student.stream;
+      counts[key] = (counts[key] || 0) + 1;
+      if (student.streamSize > 50) throw new Error("Stream over 50: " + key);
+      if (student.terms[0].form !== 1) throw new Error("Missing Form 1 entry for " + student.adm);
+      if (student.terms[student.terms.length - 1].form !== student.form) throw new Error("Latest form mismatch " + student.adm);
+    });
+    if (school.students.length < 700) throw new Error("Register too small");
+    if (!brian || brian.name !== "Brian Njeru" || brian.teacherId !== "CT-4N") throw new Error("Demo student mismatch");
+    if (!south || south.form !== 2 || south.stream !== "South") throw new Error("South demo mismatch");
+    if (!east || east.form !== 1 || east.stream !== "East") throw new Error("East demo mismatch");
+    var parent = api.authenticate("parent", "kbest-4n-001", api.DEMO_PASSWORD);
+    var teacher = api.authenticate("staff", "ct-4n", "CT-4N");
+    var bad = api.authenticate("parent", "KBEST-4N-001", "wrong-password");
+    if (!parent.session || parent.session.studentAdm !== "KBEST-4N-001") throw new Error("Parent login failed");
+    if (!teacher.session || teacher.session.staffId !== "CT-4N") throw new Error("Teacher login failed");
+    if (!bad.error) throw new Error("Bad password was accepted");
+    Object.keys(counts).forEach(function (key) {
+      if (counts[key] > 50) throw new Error(key + " has " + counts[key]);
+    });
+    console.log("KBEST check ok:", school.students.length, "students;", Object.keys(api.CLASS_TEACHERS).length, "class teachers; Brian", brian.latestGrade, "pos", brian.position + "/" + brian.streamSize);
+  }
+})(typeof self !== "undefined" ? self : this, function () {
+  var DEMO_PASSWORD = "kbest2026";
+  var ALLOW_ID_AS_PASSWORD = true;
+  var STREAMS = ["North", "South", "West", "East"];
+  var STREAM_SIZE = { North: 50, South: 48, West: 46, East: 45 };
+  var CURRENT_YEAR = 2026;
+
+  var FIRST = [
+    "Brian", "Kevin", "Dennis", "Samuel", "Peter", "James", "David", "Emmanuel",
+    "Felix", "Collins", "Victor", "Eric", "Daniel", "Joseph", "Moses", "Isaac",
+    "Caleb", "Gideon", "Allan", "Martin", "Stephen", "Francis", "Patrick", "John",
+    "Paul", "Timothy", "Nicholas", "Andrew", "Benjamin", "Simon", "Geoffrey",
+    "Kennedy", "Evans", "Boniface", "Dominic", "Edwin", "Fredrick", "George",
+    "Henry", "Ian", "Lawrence", "Mark", "Nathan", "Oscar", "Pius", "Robert",
+    "Solomon", "Titus", "Wilson", "Alex", "Chris", "Duncan"
+  ];
+  var LAST = [
+    "Njeru", "Njagi", "Nyaga", "Mutegi", "Ndwiga", "Kinyua", "Ireri", "Mugo",
+    "Kathuri", "Njoka", "Nthiga", "Muriithi", "Ngari", "Kivuti", "Njue", "Mbaka",
+    "Murimi", "Mucira", "Njiru", "Kariuki", "Mwangi", "Otieno", "Wanjala", "Kamau",
+    "Maina", "Ochieng", "Kimani", "Cheruiyot", "Barasa", "Were"
+  ];
+
+  var CLASS_TEACHERS = {
+    "1N": { id: "CT-1N", name: "Mr. Peter Ndwiga", subject: "English", form: 1, stream: "North" },
+    "1S": { id: "CT-1S", name: "Ms. Grace Mutegi", subject: "Kiswahili", form: 1, stream: "South" },
+    "1W": { id: "CT-1W", name: "Mr. David Kinyua", subject: "Mathematics", form: 1, stream: "West" },
+    "1E": { id: "CT-1E", name: "Ms. Ruth Ireri", subject: "Biology", form: 1, stream: "East" },
+    "2N": { id: "CT-2N", name: "Mr. Stephen Nyaga", subject: "Geography", form: 2, stream: "North" },
+    "2S": { id: "CT-2S", name: "Mr. Collins Mugo", subject: "History and Government", form: 2, stream: "South" },
+    "2W": { id: "CT-2W", name: "Ms. Faith Kathuri", subject: "Chemistry", form: 2, stream: "West" },
+    "2E": { id: "CT-2E", name: "Mr. Victor Njoka", subject: "Christian Religious Education", form: 2, stream: "East" },
+    "3N": { id: "CT-3N", name: "Mr. Henry Nthiga", subject: "Physics", form: 3, stream: "North" },
+    "3S": { id: "CT-3S", name: "Ms. Lucy Muriithi", subject: "Agriculture", form: 3, stream: "South" },
+    "3W": { id: "CT-3W", name: "Mr. Nicholas Wanjala", subject: "Business Studies", form: 3, stream: "West" },
+    "3E": { id: "CT-3E", name: "Mr. Edwin Otieno", subject: "Computer Studies", form: 3, stream: "East" },
+    "4N": { id: "CT-4N", name: "Mr. Samuel Kariuki", subject: "Mathematics", form: 4, stream: "North" },
+    "4S": { id: "CT-4S", name: "Ms. Ann Njiru", subject: "English", form: 4, stream: "South" },
+    "4W": { id: "CT-4W", name: "Mr. Moses Mbaka", subject: "Chemistry", form: 4, stream: "West" },
+    "4E": { id: "CT-4E", name: "Mr. Timothy Kivuti", subject: "Biology", form: 4, stream: "East" }
+  };
+
+  var LEADERSHIP = [
+    { id: "PRINCIPAL", name: "Mr. Francis Murimi", title: "Principal", scope: "school" },
+    { id: "DEPUTY", name: "Mr. Daniel Mucira", title: "Deputy Principal, Academics", scope: "school" },
+    { id: "DEAN", name: "Mr. Joseph Njue", title: "Dean of Students", scope: "school" }
+  ];
+
+  var TOPICS = [
+    "Academic progress",
+    "Discipline and welfare",
+    "Boarding matters",
+    "Absence",
+    "General"
+  ];
+
+  var CORE = ["English", "Kiswahili", "Mathematics"];
+  var SCI = ["Biology", "Chemistry", "Physics"];
+  var HUM = ["History and Government", "Geography", "Christian Religious Education"];
+  var APP = ["Agriculture", "Business Studies", "Computer Studies"];
+
+  var cache = null;
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0;
+      a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function avg(list) {
+    if (!list.length) return 0;
+    return list.reduce(function (sum, n) { return sum + n; }, 0) / list.length;
+  }
+
+  function pickN(arr, n, rnd) {
+    var copy = arr.slice();
+    var out = [];
+    while (out.length < n && copy.length) {
+      out.push(copy.splice(Math.floor(rnd() * copy.length), 1)[0]);
+    }
+    return out;
+  }
+
+  function markBand(score) {
+    var bands = [
+      [80, 12, "A", "Excellent"],
+      [75, 11, "A-", "Excellent"],
+      [70, 10, "B+", "Very good"],
+      [65, 9, "B", "Very good"],
+      [60, 8, "B-", "Good"],
+      [55, 7, "C+", "Good"],
+      [50, 6, "C", "Satisfactory"],
+      [45, 5, "C-", "Satisfactory"],
+      [40, 4, "D+", "Below expectation"],
+      [35, 3, "D", "Below expectation"],
+      [30, 2, "D-", "Needs support"],
+      [0, 1, "E", "Needs urgent support"]
+    ];
+    for (var i = 0; i < bands.length; i++) {
+      if (score >= bands[i][0]) {
+        return { points: bands[i][1], grade: bands[i][2], remark: bands[i][3] };
+      }
+    }
+    return { points: 1, grade: "E", remark: "Needs urgent support" };
+  }
+
+  function gradeFromPoints(points) {
+    var bands = [
+      [11.5, "A"], [10.5, "A-"], [9.5, "B+"], [8.5, "B"], [7.5, "B-"],
+      [6.5, "C+"], [5.5, "C"], [4.5, "C-"], [3.5, "D+"], [2.5, "D"],
+      [1.5, "D-"], [0, "E"]
+    ];
+    for (var i = 0; i < bands.length; i++) {
+      if (points >= bands[i][0]) return bands[i][1];
+    }
+    return "E";
+  }
+
+  function teacherRemark(grade, first) {
+    var lines = {
+      A: first + " has produced excellent work this term and should protect this standard.",
+      "A-": first + " is working at a high standard. Consistency will hold the grade.",
+      "B+": first + " is doing very good work. A little more precision will lift the mean.",
+      B: first + " has a solid term. Targeted revision in weaker subjects will help.",
+      "B-": first + " is on a good path. Classwork and corrections need to stay regular.",
+      "C+": first + " is making steady progress. Extra practice in weaker papers is needed.",
+      C: first + " has a satisfactory term. A clear study plan will move the mean up.",
+      "C-": first + " is just below the class target. Attend clinics and finish corrections.",
+      "D+": first + " needs a firmer routine. The class teacher will follow up on weak subjects.",
+      D: first + " is below expectation. Please support daily revision at home.",
+      "D-": first + " needs close academic support this term.",
+      E: first + " needs urgent academic support. Kindly speak with the class teacher."
+    };
+    return lines[grade] || lines.C;
+  }
+
+  function streamLetter(stream) {
+    return stream.charAt(0);
+  }
+
+  function admissionOf(form, stream, index) {
+    var n = String(index).padStart(3, "0");
+    return "KBEST-" + form + streamLetter(stream) + "-" + n;
+  }
+
+  function entryYear(form) {
+    return CURRENT_YEAR - (form - 1);
+  }
+
+  function buildStudent(form, stream, index, rnd, usedNames) {
+    var first;
+    var last;
+    if (form === 4 && stream === "North" && index === 1) {
+      first = "Brian";
+      last = "Njeru";
+      usedNames["Brian Njeru"] = true;
+    } else {
+      first = FIRST[Math.floor(rnd() * FIRST.length)];
+      last = LAST[Math.floor(rnd() * LAST.length)];
+      var guard = 0;
+      while (usedNames[first + " " + last] && guard < 12) {
+        first = FIRST[Math.floor(rnd() * FIRST.length)];
+        last = LAST[Math.floor(rnd() * LAST.length)];
+        guard++;
+      }
+      if (usedNames[first + " " + last]) last = last + " " + streamLetter(stream) + index;
+      usedNames[first + " " + last] = true;
+    }
+
+    var key = form + streamLetter(stream);
+    var teacher = CLASS_TEACHERS[key];
+    var featured = form === 4 && stream === "North" && index === 1;
+    var subjects = featured
+      ? ["English", "Kiswahili", "Mathematics", "Biology", "Chemistry", "History and Government", "Geography", "Agriculture"]
+      : CORE.concat(pickN(SCI, 2, rnd), pickN(HUM, 2, rnd), pickN(APP, 1, rnd));
+    var base = featured ? 71 : 52 + rnd() * 24;
+    var growth = 0.28 + rnd() * 0.7;
+    var profiles = subjects.map(function (name) {
+      return { name: name, bias: (rnd() - 0.48) * 16, wave: rnd() * 6 };
+    });
+
+    var terms = [];
+    var termIndex = 0;
+    for (var f = 1; f <= form; f++) {
+      var lastTerm = f === form ? 3 : 3;
+      for (var term = 1; term <= lastTerm; term++) {
+        var isMidterm = f === form && term === 3;
+        var rows = profiles.map(function (profile) {
+          var raw = base + profile.bias + growth * termIndex + Math.sin(profile.wave + termIndex) * 2.4 + (rnd() - 0.5) * 7;
+          if (featured && profile.name === "Chemistry") raw -= 16;
+          if (featured && profile.name !== "Chemistry") raw += 4;
+          var score = Math.round(clamp(raw, 22, 96));
+          var band = markBand(score);
+          return {
+            name: profile.name,
+            score: score,
+            grade: band.grade,
+            points: band.points,
+            remark: band.remark
+          };
+        });
+        rows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+        var meanPoints = avg(rows.map(function (row) { return row.points; }));
+        var meanScore = avg(rows.map(function (row) { return row.score; }));
+        var meanGrade = gradeFromPoints(meanPoints);
+        var conductRoll = rnd();
+        terms.push({
+          form: f,
+          term: term,
+          year: entryYear(form) + (f - 1),
+          kind: isMidterm ? "midterm" : "endterm",
+          label: "Form " + f + " · Term " + term + (isMidterm ? " · Midterm" : ""),
+          subjects: rows,
+          meanPoints: meanPoints,
+          meanScore: meanScore,
+          meanGrade: meanGrade,
+          conduct: conductRoll > 0.9 ? "B" : "A",
+          attendance: Math.round((91 + rnd() * 8) * 10) / 10,
+          remark: teacherRemark(meanGrade, first)
+        });
+        termIndex++;
+      }
+    }
+
+    var latest = terms[terms.length - 1];
+    var entry = terms[0];
+    return {
+      adm: admissionOf(form, stream, index),
+      first: first,
+      last: last,
+      name: first + " " + last,
+      guardian: "Mr. and Mrs. " + last,
+      form: form,
+      stream: stream,
+      streamKey: key,
+      teacherId: teacher.id,
+      teacherName: teacher.name,
+      subjects: subjects,
+      terms: terms,
+      entryPoints: entry.meanPoints,
+      entryGrade: entry.meanGrade,
+      latestPoints: latest.meanPoints,
+      latestGrade: latest.meanGrade,
+      entryYear: entryYear(form)
+    };
+  }
+
+  function buildSchool() {
+    var rnd = mulberry32(0x4b424553);
+    var usedNames = {};
+    var students = [];
+    for (var form = 1; form <= 4; form++) {
+      STREAMS.forEach(function (stream) {
+        var size = STREAM_SIZE[stream];
+        for (var i = 1; i <= size; i++) students.push(buildStudent(form, stream, i, rnd, usedNames));
+      });
+    }
+
+    var groups = {};
+    students.forEach(function (student) {
+      var key = student.form + "|" + student.stream;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(student);
+    });
+    Object.keys(groups).forEach(function (key) {
+      var list = groups[key].slice().sort(function (a, b) {
+        return b.latestPoints - a.latestPoints || a.name.localeCompare(b.name);
+      });
+      var streamAverage = avg(list.map(function (student) { return student.latestPoints; }));
+      var position = 0;
+      var lastPoints = null;
+      list.forEach(function (student, index) {
+        if (lastPoints === null || Math.abs(student.latestPoints - lastPoints) > 0.001) position = index + 1;
+        lastPoints = student.latestPoints;
+        student.position = position;
+        student.streamSize = list.length;
+        student.streamAverage = streamAverage;
+      });
+    });
+
+    var byAdm = {};
+    students.forEach(function (student) { byAdm[student.adm] = student; });
+    return { students: students, byAdm: byAdm };
+  }
+
+  function getSchool() {
+    if (!cache) cache = buildSchool();
+    return cache;
+  }
+
+  function studentByAdm(adm) {
+    if (!adm) return null;
+    return getSchool().byAdm[String(adm).trim().toUpperCase()] || null;
+  }
+
+  function classList(form, stream) {
+    return getSchool().students
+      .filter(function (student) { return student.form === form && student.stream === stream; })
+      .sort(function (a, b) { return a.position - b.position || a.name.localeCompare(b.name); });
+  }
+
+  function searchStudents(query, form, stream) {
+    var q = String(query || "").trim().toLowerCase();
+    return getSchool().students.filter(function (student) {
+      if (form && student.form !== Number(form)) return false;
+      if (stream && student.stream !== stream) return false;
+      if (!q) return true;
+      return student.adm.toLowerCase().indexOf(q) !== -1 || student.name.toLowerCase().indexOf(q) !== -1;
+    }).sort(function (a, b) {
+      return a.form - b.form || a.stream.localeCompare(b.stream) || a.position - b.position;
+    });
+  }
+
+  function staffById(id) {
+    var key = String(id || "").trim().toUpperCase();
+    var classIds = Object.keys(CLASS_TEACHERS);
+    for (var i = 0; i < classIds.length; i++) {
+      var teacher = CLASS_TEACHERS[classIds[i]];
+      if (teacher.id === key) {
+        return {
+          id: teacher.id,
+          name: teacher.name,
+          title: "Class teacher, Form " + teacher.form + " " + teacher.stream,
+          subject: teacher.subject,
+          form: teacher.form,
+          stream: teacher.stream,
+          scope: "class"
+        };
+      }
+    }
+    for (var j = 0; j < LEADERSHIP.length; j++) {
+      if (LEADERSHIP[j].id === key) return LEADERSHIP[j];
+    }
+    return null;
+  }
+
+  function passwordOk(id, password) {
+    var typed = String(password || "").trim();
+    if (!typed) return false;
+    if (typed === DEMO_PASSWORD) return true;
+    if (ALLOW_ID_AS_PASSWORD && typed.toUpperCase() === String(id).toUpperCase()) return true;
+    return false;
+  }
+
+  function authenticate(kind, id, password) {
+    var clean = String(id || "").trim().toUpperCase();
+    if (!clean || !String(password || "").trim()) {
+      return { error: "Enter both the ID and the password." };
+    }
+    if (kind === "parent") {
+      var student = studentByAdm(clean);
+      if (!student) return { error: "That admission number is not on the KBEST register." };
+      if (!passwordOk(clean, password)) return { error: "The password does not match this admission number." };
+      return {
+        session: {
+          kind: "parent",
+          studentAdm: student.adm,
+          name: student.guardian,
+          roleLabel: "Parent or guardian"
+        }
+      };
+    }
+    var staff = staffById(clean);
+    if (!staff) return { error: "That staff ID is not on the KBEST directory." };
+    if (!passwordOk(clean, password)) return { error: "The password does not match this staff ID." };
+    return {
+      session: {
+        kind: "staff",
+        staffId: staff.id,
+        name: staff.name,
+        roleLabel: staff.title,
+        form: staff.form || null,
+        stream: staff.stream || null,
+        scope: staff.scope,
+        subject: staff.subject || ""
+      }
+    };
+  }
+
+  function store() {
+    try {
+      if (typeof localStorage !== "undefined") return localStorage;
+    } catch (err) { /* private mode */ }
+    if (!store.memory) {
+      store.memory = {
+        bag: {},
+        getItem: function (key) { return Object.prototype.hasOwnProperty.call(this.bag, key) ? this.bag[key] : null; },
+        setItem: function (key, value) { this.bag[key] = String(value); },
+        removeItem: function (key) { delete this.bag[key]; }
+      };
+    }
+    return store.memory;
+  }
+
+  function seedMessages() {
+    var brian = studentByAdm("KBEST-4N-001");
+    var south = studentByAdm("KBEST-2S-010");
+    return [
+      {
+        id: "seed-1",
+        studentAdm: brian.adm,
+        channel: "CT-4N",
+        sender: "parent",
+        senderName: brian.guardian,
+        topic: "Academic progress",
+        body: "Good evening, Mr. Kariuki. Kindly update us on how Brian is preparing for the KCSE practicals, and which papers need more time at home.",
+        at: "2026-09-28T16:10:00.000Z",
+        readBy: ["parent"]
+      },
+      {
+        id: "seed-2",
+        studentAdm: brian.adm,
+        channel: "CT-4N",
+        sender: "staff",
+        senderName: "Mr. Samuel Kariuki",
+        topic: "Academic progress",
+        body: "Thank you. Brian is steady in Mathematics and English. Chemistry practicals need more practice on titration and qualitative analysis. I have booked him into the Thursday clinic at 4.30pm. His latest midterm mean is on the portal.",
+        at: "2026-09-29T07:40:00.000Z",
+        readBy: ["CT-4N"]
+      },
+      {
+        id: "seed-3",
+        studentAdm: south.adm,
+        channel: "CT-2S",
+        sender: "parent",
+        senderName: south.guardian,
+        topic: "Absence",
+        body: "Our son will miss lessons on Monday 5 October for a hospital review. He will bring the note when he returns on Tuesday.",
+        at: "2026-10-02T18:05:00.000Z",
+        readBy: ["parent"]
+      }
+    ];
+  }
+
+  function loadMessages() {
+    var raw = store().getItem("kbest.messages.v1");
+    if (!raw) {
+      var seeded = seedMessages();
+      saveMessages(seeded);
+      return seeded;
+    }
+    try {
+      var parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : seedMessages();
+    } catch (err) {
+      return seedMessages();
+    }
+  }
+
+  function saveMessages(list) {
+    store().setItem("kbest.messages.v1", JSON.stringify(list));
+  }
+
+  function resetMessages() {
+    var seeded = seedMessages();
+    saveMessages(seeded);
+    return seeded;
+  }
+
+  function messagesFor(studentAdm, channel) {
+    return loadMessages()
+      .filter(function (message) {
+        return message.studentAdm === studentAdm && (!channel || message.channel === channel);
+      })
+      .sort(function (a, b) { return a.at < b.at ? -1 : 1; });
+  }
+
+  function threadsForStaff(staffId) {
+    var grouped = {};
+    loadMessages().forEach(function (message) {
+      if (message.channel !== staffId) return;
+      if (!grouped[message.studentAdm]) grouped[message.studentAdm] = [];
+      grouped[message.studentAdm].push(message);
+    });
+    return Object.keys(grouped).map(function (adm) {
+      var items = grouped[adm].sort(function (a, b) { return a.at < b.at ? -1 : 1; });
+      var student = studentByAdm(adm);
+      var unread = items.filter(function (message) {
+        return message.sender === "parent" && message.readBy.indexOf(staffId) === -1;
+      }).length;
+      return {
+        studentAdm: adm,
+        student: student,
+        last: items[items.length - 1],
+        unread: unread
+      };
+    }).sort(function (a, b) { return a.last.at < b.last.at ? 1 : -1; });
+  }
+
+  function unreadCount(session) {
+    if (!session) return 0;
+    var messages = loadMessages();
+    if (session.kind === "parent") {
+      return messages.filter(function (message) {
+        return message.studentAdm === session.studentAdm && message.sender === "staff" && message.readBy.indexOf("parent") === -1;
+      }).length;
+    }
+    return messages.filter(function (message) {
+      return message.channel === session.staffId && message.sender === "parent" && message.readBy.indexOf(session.staffId) === -1;
+    }).length;
+  }
+
+  function markRead(session, studentAdm, channel) {
+    var key = session.kind === "parent" ? "parent" : session.staffId;
+    var messages = loadMessages();
+    var changed = false;
+    messages.forEach(function (message) {
+      if (message.studentAdm !== studentAdm || message.channel !== channel) return;
+      if (message.readBy.indexOf(key) !== -1) return;
+      message.readBy.push(key);
+      changed = true;
+    });
+    if (changed) saveMessages(messages);
+  }
+
+  function sendMessage(input) {
+    var body = String(input.body || "").trim();
+    var topic = TOPICS.indexOf(input.topic) === -1 ? "General" : input.topic;
+    if (body.length < 2) return { error: "Write a short message before sending." };
+    if (body.length > 1000) return { error: "Keep the message within 1,000 characters." };
+    var student = studentByAdm(input.studentAdm);
+    if (!student) return { error: "Student record not found." };
+    var staff = staffById(input.channel);
+    if (!staff) return { error: "Choose a member of staff." };
+    if (staff.scope === "class" && (staff.form !== student.form || staff.stream !== student.stream)) {
+      return { error: "That class teacher does not take this stream." };
+    }
+    var message = {
+      id: "m-" + Date.now().toString(36) + "-" + Math.floor(Math.random() * 1000),
+      studentAdm: student.adm,
+      channel: staff.id,
+      sender: input.sender,
+      senderName: input.senderName,
+      topic: topic,
+      body: body,
+      at: new Date().toISOString(),
+      readBy: [input.sender === "parent" ? "parent" : input.channel]
+    };
+    var all = loadMessages();
+    all.push(message);
+    saveMessages(all);
+    return { ok: true, message: message };
+  }
+
+  function recipientsFor(student) {
+    var classTeacher = staffById(student.teacherId);
+    return [classTeacher].concat(LEADERSHIP);
+  }
+
+  function latestSubjectsRanked(student) {
+    var latest = student.terms[student.terms.length - 1];
+    return latest.subjects.slice().sort(function (a, b) { return b.points - a.points || b.score - a.score; });
+  }
+
+  function yearSummaries(student) {
+    var buckets = {};
+    student.terms.forEach(function (term) {
+      if (!buckets[term.form]) buckets[term.form] = [];
+      buckets[term.form].push(term);
+    });
+    return Object.keys(buckets).map(function (form) {
+      var terms = buckets[form];
+      var points = avg(terms.map(function (term) { return term.meanPoints; }));
+      return {
+        form: Number(form),
+        year: terms[0].year,
+        meanPoints: points,
+        meanGrade: gradeFromPoints(points),
+        assessments: terms.length
+      };
+    });
+  }
+
+  function narrative(student) {
+    var delta = student.latestPoints - student.entryPoints;
+    var path = delta > 0.45 ? "an upward path" : delta < -0.45 ? "a dip that needs attention" : "a steady path";
+    var ranked = latestSubjectsRanked(student);
+    var best = ranked[0];
+    var weak = ranked[ranked.length - 1];
+    var change = (delta > 0 ? "+" : "") + delta.toFixed(2);
+    var journey = student.form === 4 ? "from Form 1 entry to the Form 4 exit year" : "from Form 1 entry to the current form";
+    return student.first + " joined KBEST in " + student.entryYear + " (" + journey + ") with an entry mean of " +
+      student.entryGrade + ". The record shows " + path + ". The latest mean is " + student.latestGrade +
+      " (" + student.latestPoints.toFixed(2) + " points), a change of " + change +
+      " points from entry. Strongest paper now: " + best.name + " (" + best.grade + "). Paper needing most support: " +
+      weak.name + " (" + weak.grade + ").";
+  }
+
+  function termBy(student, form, term) {
+    for (var i = 0; i < student.terms.length; i++) {
+      if (student.terms[i].form === Number(form) && student.terms[i].term === Number(term)) return student.terms[i];
+    }
+    return student.terms[student.terms.length - 1];
+  }
+
+  return {
+    DEMO_PASSWORD: DEMO_PASSWORD,
+    STREAMS: STREAMS,
+    STREAM_SIZE: STREAM_SIZE,
+    CLASS_TEACHERS: CLASS_TEACHERS,
+    LEADERSHIP: LEADERSHIP,
+    TOPICS: TOPICS,
+    CURRENT_YEAR: CURRENT_YEAR,
+    getSchool: getSchool,
+    studentByAdm: studentByAdm,
+    classList: classList,
+    searchStudents: searchStudents,
+    staffById: staffById,
+    authenticate: authenticate,
+    loadMessages: loadMessages,
+    resetMessages: resetMessages,
+    messagesFor: messagesFor,
+    threadsForStaff: threadsForStaff,
+    unreadCount: unreadCount,
+    markRead: markRead,
+    sendMessage: sendMessage,
+    recipientsFor: recipientsFor,
+    yearSummaries: yearSummaries,
+    narrative: narrative,
+    termBy: termBy,
+    gradeFromPoints: gradeFromPoints,
+    admissionOf: admissionOf
+  };
+});
+
+  </script>
+  <script>
+(function () {
+  var app = document.getElementById("app");
+  var nav = document.getElementById("site-nav");
+  var state = {
+    loginKind: "parent",
+    loginId: "",
+    loginPassword: "",
+    error: "",
+    tab: "overview",
+    form: null,
+    term: null,
+    channel: "",
+    threadAdm: "",
+    q: "",
+    filterForm: "",
+    filterStream: "",
+    studentAdm: "",
+    notice: ""
+  };
+
+  function esc(value) {
+    return String(value == null ? "" : value).replace(/[&<>"']/g, function (ch) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch];
+    });
+  }
+
+  function session() {
+    try {
+      var raw = sessionStorage.getItem("kbest.session.v1");
+      return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function setSession(value) {
+    if (value) sessionStorage.setItem("kbest.session.v1", JSON.stringify(value));
+    else sessionStorage.removeItem("kbest.session.v1");
+  }
+
+  function route() {
+    var hash = (location.hash || "#home").replace(/^#\/?/, "");
+    var allowed = { home: 1, academics: 1, contact: 1, login: 1, portal: 1 };
+    return allowed[hash] ? hash : "home";
+  }
+
+  function signed(n) {
+    var text = n.toFixed(2);
+    return n > 0 ? "+" + text : text;
+  }
+
+  function deltaClass(n) {
+    if (n > 0.05) return "delta-up";
+    if (n < -0.05) return "delta-down";
+    return "delta-flat";
+  }
+
+  function gradeClass(grade) {
+    var letter = String(grade || "E").charAt(0).toLowerCase();
+    return "grade g-" + letter;
+  }
+
+  function when(iso) {
+    var date = new Date(iso);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleString("en-KE", { dateStyle: "medium", timeStyle: "short" });
+  }
+
+  function studentOf(sess) {
+    if (!sess) return null;
+    if (sess.kind === "parent") return KBEST.studentByAdm(sess.studentAdm);
+    return KBEST.studentByAdm(state.studentAdm);
+  }
+
+  function paintNav() {
+    var current = route();
+    var sess = session();
+    nav.querySelectorAll("a").forEach(function (link) {
+      var target = link.getAttribute("data-route");
+      var on = target === current || (target === "login" && current === "portal");
+      if (on) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+    var portal = document.getElementById("nav-portal");
+    if (sess) {
+      portal.textContent = "Dashboard";
+      portal.href = "#portal";
+      portal.setAttribute("data-route", "portal");
+    } else {
+      portal.textContent = "Portal";
+      portal.href = "#login";
+      portal.setAttribute("data-route", "login");
+    }
+  }
+
+  function shell(title, inner) {
+    document.title = title + " · KBEST";
+    app.innerHTML = inner;
+    paintNav();
+    var canvas = app.querySelector("canvas[data-chart]");
+    if (canvas) drawChart(canvas);
+  }
+
+  function homePage() {
+    var school = KBEST.getSchool();
+    var sample = KBEST.studentByAdm("KBEST-4N-001");
+    var latest = sample.terms[sample.terms.length - 1];
+    var rows = latest.subjects.slice(0, 4).map(function (subject) {
+      return "<tr><td>" + esc(subject.name) + "</td><td>" + subject.score + "</td><td><span class='" + gradeClass(subject.grade) + "'>" + esc(subject.grade) + "</span></td></tr>";
+    }).join("");
+    var streamCards = KBEST.STREAMS.map(function (stream) {
+      var colors = { North: "#1f6b4a", South: "#0e3b2e", West: "#8a6a32", East: "#245c73" };
+      return "<article class='card stream-card' style='--stream:" + colors[stream] + "'><h3>Form streams · " + stream + "</h3><p>Forms 1 to 4. " + KBEST.STREAM_SIZE[stream] + " students in each form, within the 50-student stream limit.</p><p><a href='#academics'>Class teachers</a></p></article>";
+    }).join("");
+    shell("Home", ""
+      + "<section class='wrap hero'>"
+      + "<div><p class='kicker'>Mbeere North · Embu County</p>"
+      + "<h1>Kanyuambora Boys High School</h1>"
+      + "<p class='lede'>KBEST is the school portal for parents and teachers. After a parent signs in with the student’s admission number, Form 1 to Form 4 results, the full progress from entry to exit, and a direct line to the class teacher are available in one place.</p>"
+      + "<div class='hero-actions'><a class='btn' href='#login'>Enter the portal</a><a class='btn btn-ghost' href='#academics'>How the school is organised</a></div></div>"
+      + "<aside class='hero-card locked-preview'><div class='mini-meta'><span>" + esc(sample.name) + "</span><span>" + esc(sample.adm) + "</span></div>"
+      + "<div class='table-wrap'><table><thead><tr><th>Subject</th><th>Score</th><th>Grade</th></tr></thead><tbody>" + rows + "</tbody></table></div>"
+      + "<div class='lock-note'>Results stay behind parent or teacher sign-in. This preview uses the sample register.</div></aside>"
+      + "</section>"
+      + "<section class='wrap trust'>"
+      + "<div><span>School</span><strong>KBEST</strong></div>"
+      + "<div><span>Students on register</span><strong>" + school.students.length + "</strong></div>"
+      + "<div><span>Forms</span><strong>1 – 4</strong></div>"
+      + "<div><span>Streams</span><strong>N · S · W · E</strong></div>"
+      + "<div><span>Class teachers</span><strong>16</strong></div>"
+      + "</section>"
+      + "<section class='wrap section'><div class='section-head'><h2>A clear line between home and school</h2><p>The portal is for academic progress and student welfare. Each conversation is tied to one student and one member of staff.</p></div>"
+      + "<div class='grid-3'>"
+      + "<article class='card'><h3>Results</h3><p>Termly scores from Form 1 to Form 4, with grades, mean, stream position, conduct, and the class teacher’s remark.</p></article>"
+      + "<article class='card'><h3>Entry to exit</h3><p>A parent can follow the mean from the first term in school to the current form, including the Form 4 exit year.</p></article>"
+      + "<article class='card'><h3>Messages</h3><p>Write to the class teacher, the deputy principal, the dean of students, or the principal about that student.</p></article>"
+      + "</div></section>"
+      + "<section class='wrap section'><div class='section-head'><h2>Four streams in every form</h2><p>North, South, West, and East. No stream carries more than 50 students.</p></div><div class='grid-4'>" + streamCards + "</div></section>"
+      + "<section class='wrap section'><div class='section-head'><h2>How a parent uses KBEST</h2></div><div class='grid-3 steps'>"
+      + "<article class='card'><h3>Sign in</h3><p>Use the admission number and the password issued for that student. On this sample register the password is kbest2026, or the admission number again.</p></article>"
+      + "<article class='card'><h3>Read the record</h3><p>Open results for any completed term, and the progress view for the journey since Form 1.</p></article>"
+      + "<article class='card'><h3>Write to school</h3><p>Send a specific, respectful note to the class teacher or another office. Replies stay on that student’s thread.</p></article>"
+      + "</div></section>");
+  }
+
+  function academicsPage() {
+    var teachers = Object.keys(KBEST.CLASS_TEACHERS).map(function (key) {
+      var teacher = KBEST.CLASS_TEACHERS[key];
+      return "<tr><td>Form " + teacher.form + "</td><td>" + esc(teacher.stream) + "</td><td>" + esc(teacher.name) + "</td><td>" + esc(teacher.subject) + "</td><td><code>" + esc(teacher.id) + "</code></td></tr>";
+    }).join("");
+    var leaders = KBEST.LEADERSHIP.map(function (person) {
+      return "<tr><td>" + esc(person.title) + "</td><td>" + esc(person.name) + "</td><td><code>" + esc(person.id) + "</code></td></tr>";
+    }).join("");
+    shell("Academics", ""
+      + "<section class='wrap page'>"
+      + "<p class='kicker'>Forms 1 to 4</p><h1>Academic structure</h1>"
+      + "<p class='lede'>Every form is divided into North, South, West, and East. A class teacher follows that stream and is the first person a parent writes to.</p>"
+      + "<div class='grid-2' style='margin-top:22px'>"
+      + "<article class='card'><h3>Subjects on the report</h3><p>Each student takes eight subjects: English, Kiswahili, Mathematics, two sciences, two humanities, and one applied subject. The term mean is the average of all eight.</p>"
+      + "<p>Grades follow the familiar secondary scale from A (12 points) to E (1 point). A mean grade is worked from the average points.</p></article>"
+      + "<article class='card'><h3>What parents can see</h3><p>After sign-in: every term from Form 1, the latest stream position, attendance, conduct, and a written remark. Form 4 shows the path through the exit year. KCSE certificates are released by KNEC and are not invented here.</p></article>"
+      + "</div>"
+      + "<h2 style='margin-top:28px'>Class teachers</h2>"
+      + "<p class='note'>These names are the sample staff directory so messaging can be tried immediately. Replace them when the school connects its real staff list.</p>"
+      + "<div class='table-wrap card' style='padding:8px 12px'><table><thead><tr><th>Form</th><th>Stream</th><th>Class teacher</th><th>Teaching subject</th><th>Staff ID</th></tr></thead><tbody>" + teachers + "</tbody></table></div>"
+      + "<h2 style='margin-top:28px'>Offices a parent can also reach</h2>"
+      + "<div class='table-wrap card' style='padding:8px 12px'><table><thead><tr><th>Office</th><th>Name</th><th>Staff ID</th></tr></thead><tbody>" + leaders + "</tbody></table></div>"
+      + "</section>");
+  }
+
+  function contactPage() {
+    shell("Contact", ""
+      + "<section class='wrap page'>"
+      + "<p class='kicker'>School office</p><h1>Contact KBEST</h1>"
+      + "<div class='grid-2'>"
+      + "<article class='card'><h3>Visit the school</h3><p>Kanyuambora Boys High School<br>Kanyuambora, near Ishiara<br>Mbeere North Sub-County<br>Embu County, Kenya</p><p>KNEC code 14312301<br>Public boarding boys’ school</p></article>"
+      + "<article class='card'><h3>Use the right channel</h3><p>Questions about classwork, progress, discipline, or a planned absence belong in the portal, addressed to the class teacher or the relevant office.</p><p>If a student is unwell or there is an emergency, contact the school administration directly. Do not wait for a portal reply.</p><p><a class='btn' href='#login'>Open the portal</a></p></article>"
+      + "</div></section>");
+  }
+
+  function loginPage() {
+    var kind = state.loginKind;
+    shell("Sign in", ""
+      + "<section class='wrap page login-layout'>"
+      + "<div><p class='kicker'>Parent and teacher portal</p><h1>Sign in to KBEST</h1>"
+      + "<p class='lede'>Parents use the student’s admission number. Teachers use a staff ID. Results and messages open only after the details match the register.</p>"
+      + "<div class='note'>Sample password for every demonstration account: <strong>" + esc(KBEST.DEMO_PASSWORD) + "</strong>. You may also type the admission number or staff ID again as the password.</div>"
+      + "<div class='chips'>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-4N-001'>Parent · KBEST-4N-001</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-2S-010'>Parent · KBEST-2S-010</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='CT-4N'>Class teacher · CT-4N</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='PRINCIPAL'>Principal</button>"
+      + "</div></div>"
+      + "<form class='panel' data-action='login'>"
+      + "<div class='seg'>"
+      + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='parent' aria-pressed='" + (kind === "parent") + "'>Parent</button>"
+      + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='staff' aria-pressed='" + (kind === "staff") + "'>Teacher</button>"
+      + "</div>"
+      + (state.error ? "<p class='error' role='alert'>" + esc(state.error) + "</p>" : "")
+      + "<label>" + (kind === "parent" ? "Admission number" : "Staff ID")
+      + "<input name='id' autocomplete='username' required value='" + esc(state.loginId) + "' placeholder='" + (kind === "parent" ? "KBEST-4N-001" : "CT-4N") + "'></label>"
+      + "<label>Password<input name='password' type='password' autocomplete='current-password' required value='" + esc(state.loginPassword) + "'></label>"
+      + "<button class='btn' type='submit'>Sign in</button>"
+      + "</form></section>");
+  }
+
+  function tabButton(id, label, current, extra, root) {
+    return "<button class='btn btn-ghost btn-small' type='button' data-action='tab' data-tab='" + id + "'" + (root ? " data-root='1'" : "") + " aria-selected='" + (current === id) + "'>" + label + (extra || "") + "</button>";
+  }
+
+  function overviewBlock(student, sess) {
+    var delta = student.latestPoints - student.entryPoints;
+    var years = KBEST.yearSummaries(student).map(function (year) {
+      return "<article><div class='year-mark'>Form " + year.form + "</div><div><strong>" + year.year + "</strong> · mean " + esc(year.meanGrade) + " (" + year.meanPoints.toFixed(2) + " points) · " + year.assessments + " assessments</div></article>";
+    }).join("");
+    return "<div class='stats'>"
+      + "<div class='stat'><span>Latest mean</span><strong>" + esc(student.latestGrade) + "</strong></div>"
+      + "<div class='stat'><span>Entry mean</span><strong>" + esc(student.entryGrade) + "</strong></div>"
+      + "<div class='stat'><span>Change in points</span><strong class='" + deltaClass(delta) + "'>" + signed(delta) + "</strong></div>"
+      + "<div class='stat'><span>Stream position</span><strong>" + student.position + " / " + student.streamSize + "</strong></div>"
+      + "</div>"
+      + "<div class='grid-2'><article class='card'><h3>Progress from entry</h3><p>" + esc(KBEST.narrative(student)) + "</p>"
+      + "<div class='timeline'>" + years + "</div></article>"
+      + "<article class='card'><h3>Class teacher</h3><p><strong>" + esc(student.teacherName) + "</strong><br>Form " + student.form + " " + esc(student.stream) + "</p>"
+      + "<p>Stream average this term: " + student.streamAverage.toFixed(2) + " points. " + (function () {
+        var gap = student.latestPoints - student.streamAverage;
+        if (gap > 0.05) return student.first + " is " + gap.toFixed(2) + " points above that average.";
+        if (gap < -0.05) return student.first + " is " + Math.abs(gap).toFixed(2) + " points under that average.";
+        return student.first + " is level with that average.";
+      })() + "</p>"
+      + "<button class='btn btn-small' type='button' data-action='message-teacher'>" + (sess && sess.kind === "staff" ? "Message guardian" : "Message class teacher") + "</button></article></div>";
+  }
+
+  function resultsBlock(student) {
+    var selected = KBEST.termBy(student, state.form || student.form, state.term || student.terms[student.terms.length - 1].term);
+    var formPills = [];
+    var seen = {};
+    student.terms.forEach(function (term) {
+      if (seen[term.form]) return;
+      seen[term.form] = true;
+      formPills.push("<button class='btn btn-ghost btn-small' type='button' data-action='form' data-form='" + term.form + "' aria-pressed='" + (selected.form === term.form) + "'>Form " + term.form + "</button>");
+    });
+    var termPills = student.terms.filter(function (term) { return term.form === selected.form; }).map(function (term) {
+      return "<button class='btn btn-ghost btn-small' type='button' data-action='term' data-term='" + term.term + "' aria-pressed='" + (selected.term === term.term && selected.form === term.form) + "'>Term " + term.term + (term.kind === "midterm" ? " midterm" : "") + "</button>";
+    }).join("");
+    var body = selected.subjects.map(function (subject) {
+      return "<tr><td>" + esc(subject.name) + "</td><td>" + subject.score + "</td><td><span class='" + gradeClass(subject.grade) + "'>" + esc(subject.grade) + "</span></td><td>" + subject.points + "</td><td>" + esc(subject.remark) + "</td></tr>";
+    }).join("");
+    return "<div class='filters no-print'>" + formPills.join("") + termPills + "<button class='btn btn-small btn-gold' type='button' data-action='print'>Print report</button></div>"
+      + "<article class='card report-sheet'><div class='mini-meta'><span>KBEST report card</span><span>" + esc(selected.label) + " · " + selected.year + "</span></div>"
+      + "<h3>" + esc(student.name) + "</h3><p>" + esc(student.adm) + " · Form " + student.form + " " + esc(student.stream) + " · Guardian: " + esc(student.guardian) + "</p>"
+      + "<div class='table-wrap'><table><thead><tr><th>Subject</th><th>Score</th><th>Grade</th><th>Points</th><th>Remark</th></tr></thead><tbody>" + body + "</tbody></table></div>"
+      + "<div class='stats'><div class='stat'><span>Mean score</span><strong>" + selected.meanScore.toFixed(1) + "</strong></div>"
+      + "<div class='stat'><span>Mean grade</span><strong>" + esc(selected.meanGrade) + "</strong></div>"
+      + "<div class='stat'><span>Conduct</span><strong>" + esc(selected.conduct) + "</strong></div>"
+      + "<div class='stat'><span>Attendance</span><strong>" + selected.attendance.toFixed(1) + "%</strong></div></div>"
+      + "<p><strong>Class teacher remark.</strong> " + esc(selected.remark) + "</p>"
+      + "<div class='signatures'><div>Class teacher<br>" + esc(student.teacherName) + "</div><div>Principal<br>Mr. Francis Murimi</div></div></article>";
+  }
+
+  function progressBlock(student) {
+    var rows = student.terms.map(function (term) {
+      return "<tr><td>" + esc(term.label) + "</td><td>" + term.year + "</td><td>" + term.meanScore.toFixed(1) + "</td><td><span class='" + gradeClass(term.meanGrade) + "'>" + esc(term.meanGrade) + "</span></td><td>" + term.meanPoints.toFixed(2) + "</td></tr>";
+    }).join("");
+    var exit = student.form === 4
+      ? "<p>The line below runs from Form 1 entry in " + student.entryYear + " to the Form 4 exit year. The latest mean is the school’s current picture of his standing. The official KCSE result is issued separately by KNEC.</p>"
+      : "<p>This chart runs from Form 1 entry to the current form. Later forms are added to the same record as he moves up.</p>";
+    return "<article class='card'><h3>Mean points from entry</h3>" + exit
+      + "<canvas class='chart' data-chart='" + esc(student.adm) + "' role='img' aria-label='Mean points for " + esc(student.name) + " from Form 1 to the latest assessment'></canvas>"
+      + "<div class='table-wrap' style='margin-top:12px'><table><thead><tr><th>Assessment</th><th>Year</th><th>Mean score</th><th>Grade</th><th>Points</th></tr></thead><tbody>" + rows + "</tbody></table></div></article>";
+  }
+
+  function messagePane(student, channel, sess) {
+    var mine = sess.kind === "parent" ? "parent" : "staff";
+    KBEST.markRead(sess, student.adm, channel);
+    var items = KBEST.messagesFor(student.adm, channel);
+    var bubbles = items.length ? items.map(function (message) {
+      var cls = message.sender === mine ? "bubble mine" : "bubble";
+      return "<article class='" + cls + "'><small>" + esc(message.senderName) + " · " + esc(message.topic) + " · " + esc(when(message.at)) + "</small><p>" + esc(message.body) + "</p></article>";
+    }).join("") : "<p class='note'>No messages on this thread yet. Write clearly about this student.</p>";
+    var topics = KBEST.TOPICS.map(function (topic) {
+      return "<option>" + esc(topic) + "</option>";
+    }).join("");
+    return "<div class='bubbles'>" + bubbles + "</div>"
+      + "<form data-action='send'><input type='hidden' name='adm' value='" + esc(student.adm) + "'><input type='hidden' name='channel' value='" + esc(channel) + "'>"
+      + "<label>Topic<select name='topic'>" + topics + "</select></label>"
+      + "<label>Message<textarea name='body' minlength='2' maxlength='1000' required placeholder='Write about this student’s academics or welfare.'></textarea></label>"
+      + "<p class='fine'>Be specific and professional. Teachers reply on working days.</p>"
+      + (state.notice ? "<p class='error' role='alert'>" + esc(state.notice) + "</p>" : "")
+      + "<button class='btn' type='submit'>Send message</button></form>";
+  }
+
+  function messagesBlock(student, sess) {
+    var recipients = KBEST.recipientsFor(student);
+    if (!state.channel) state.channel = student.teacherId;
+    KBEST.markRead(sess, student.adm, state.channel);
+    var list = recipients.map(function (person) {
+      var preview = KBEST.messagesFor(student.adm, person.id);
+      var last = preview[preview.length - 1];
+      var unread = preview.filter(function (message) {
+        var key = sess.kind === "parent" ? "parent" : sess.staffId;
+        return message.sender !== (sess.kind === "parent" ? "parent" : "staff") && message.readBy.indexOf(key) === -1;
+      }).length;
+      return "<button type='button' data-action='channel' data-channel='" + esc(person.id) + "' aria-pressed='" + (state.channel === person.id) + "'><strong>" + esc(person.name) + "</strong><br><small>" + esc(person.title || person.roleLabel || "Class teacher") + (last ? " · " + esc(last.topic) : "") + "</small>" + (unread ? " <span class='badge'>" + unread + "</span>" : "") + "</button>";
+    }).join("");
+    var active = recipients.filter(function (person) { return person.id === state.channel; })[0] || recipients[0];
+    return "<div class='note'>Messages are about " + esc(student.name) + " (" + esc(student.adm) + ") only. If there is an emergency, contact the school office directly.</div>"
+      + "<div class='messages' style='margin-top:12px'><div class='thread-list'>" + list + "</div><article class='card'><h3>" + esc(active.name) + "</h3><p>" + esc(active.title || ("Class teacher, Form " + student.form + " " + student.stream)) + "</p>" + messagePane(student, active.id, sess) + "</article></div>";
+  }
+
+  function parentPortal(sess) {
+    var student = KBEST.studentByAdm(sess.studentAdm);
+    if (!state.form) state.form = student.form;
+    if (!state.term) state.term = student.terms[student.terms.length - 1].term;
+    var body = state.tab === "results" ? resultsBlock(student)
+      : state.tab === "progress" ? progressBlock(student)
+      : state.tab === "messages" ? messagesBlock(student, sess)
+      : overviewBlock(student, sess);
+    var unread = KBEST.unreadCount(sess);
+    shell("Parent portal", ""
+      + "<section class='wrap page'><div class='portal-head'><div><p class='kicker'>Parent portal</p><h1>" + esc(student.name) + "</h1>"
+      + "<p class='who'>" + esc(student.adm) + " · Form " + student.form + " " + esc(student.stream) + " · Signed in as " + esc(sess.name) + "</p></div>"
+      + "<button class='btn btn-ghost no-print' type='button' data-action='logout'>Sign out</button></div>"
+      + "<div class='tabs no-print'>"
+      + tabButton("overview", "Overview", state.tab)
+      + tabButton("results", "Results", state.tab)
+      + tabButton("progress", "Entry to exit", state.tab)
+      + tabButton("messages", "Messages", state.tab, unread ? " <span class='badge'>" + unread + "</span>" : "")
+      + "</div>" + body
+      + "<p class='no-print' style='margin-top:18px'><button class='btn btn-danger btn-small' type='button' data-action='reset'>Reset sample messages</button></p></section>");
+  }
+
+  function staffList(sess) {
+    var form = sess.scope === "class" ? sess.form : Number(state.filterForm || 0);
+    var stream = sess.scope === "class" ? sess.stream : state.filterStream;
+    var matched = sess.scope === "class"
+      ? KBEST.classList(sess.form, sess.stream).filter(function (student) {
+        var q = state.q.trim().toLowerCase();
+        if (!q) return true;
+        return student.name.toLowerCase().indexOf(q) !== -1 || student.adm.toLowerCase().indexOf(q) !== -1;
+      })
+      : KBEST.searchStudents(state.q, form || "", stream || "");
+    var rows = sess.scope === "class" ? matched : matched.slice(0, 40);
+    var trimmed = matched.length > rows.length;
+    var body = rows.map(function (student) {
+      var delta = student.latestPoints - student.entryPoints;
+      return "<tr class='click-row' data-action='open-student' data-adm='" + esc(student.adm) + "'><td>" + student.position + "</td><td><strong>" + esc(student.name) + "</strong><br><small>" + esc(student.adm) + "</small></td>"
+        + "<td class='hide-sm'>Form " + student.form + " " + esc(student.stream) + "</td>"
+        + "<td><span class='" + gradeClass(student.latestGrade) + "'>" + esc(student.latestGrade) + "</span></td>"
+        + "<td class='" + deltaClass(delta) + "'>" + signed(delta) + "</td></tr>";
+    }).join("");
+    var filters = "";
+    if (sess.scope === "school") {
+      filters = "<div class='filters'><input name='q' data-action='query' placeholder='Name or admission number' value='" + esc(state.q) + "'>"
+        + "<select data-action='filter-form'><option value=''>All forms</option>"
+        + [1, 2, 3, 4].map(function (formNo) { return "<option" + (String(state.filterForm) === String(formNo) ? " selected" : "") + ">" + formNo + "</option>"; }).join("")
+        + "</select><select data-action='filter-stream'><option value=''>All streams</option>"
+        + KBEST.STREAMS.map(function (streamName) { return "<option" + (state.filterStream === streamName ? " selected" : "") + ">" + esc(streamName) + "</option>"; }).join("")
+        + "</select></div>";
+    } else {
+      filters = "<div class='filters'><input data-action='query' placeholder='Search this stream' value='" + esc(state.q) + "'></div>";
+    }
+    return "<h2>" + (sess.scope === "class" ? "Form " + sess.form + " " + esc(sess.stream) : "School register") + "</h2>"
+      + "<p class='who'>" + rows.length + " students shown" + (trimmed ? " of " + matched.length + ". Narrow the search to see a specific student." : ". Open a row to see the full record and write to the guardian.") + "</p>"
+      + filters
+      + "<div class='table-wrap card' style='padding:8px 12px'><table><thead><tr><th>Pos</th><th>Student</th><th class='hide-sm'>Class</th><th>Latest</th><th>Since entry</th></tr></thead><tbody>"
+      + (body || "<tr><td colspan='5'>No student matches that search.</td></tr>")
+      + "</tbody></table></div>";
+  }
+
+  function staffInbox(sess) {
+    var threads = KBEST.threadsForStaff(sess.staffId);
+    if (!state.threadAdm && threads[0]) state.threadAdm = threads[0].studentAdm;
+    if (state.threadAdm) KBEST.markRead(sess, state.threadAdm, sess.staffId);
+    threads = KBEST.threadsForStaff(sess.staffId);
+    var list = threads.length ? threads.map(function (thread) {
+      var name = thread.student ? thread.student.name : thread.studentAdm;
+      return "<button type='button' data-action='thread' data-adm='" + esc(thread.studentAdm) + "' aria-pressed='" + (state.threadAdm === thread.studentAdm) + "'><strong>" + esc(name) + "</strong>" + (thread.unread ? " <span class='badge'>" + thread.unread + "</span>" : "") + "<br><small>" + esc(thread.last.topic) + " · " + esc(when(thread.last.at)) + "</small></button>";
+    }).join("") : "<p class='note'>No guardian has written yet. Open a student from the class list to start a thread.</p>";
+    var student = KBEST.studentByAdm(state.threadAdm);
+    var pane = student ? "<article class='card'><h3>" + esc(student.guardian) + "</h3><p>About " + esc(student.name) + " · " + esc(student.adm) + "</p>" + messagePane(student, sess.staffId, sess) + "</article>" : "<article class='card'><p>Select a conversation.</p></article>";
+    return "<div class='messages'><div class='thread-list'>" + list + "</div>" + pane + "</div>";
+  }
+
+  function staffPortal(sess) {
+    var student = state.studentAdm ? KBEST.studentByAdm(state.studentAdm) : null;
+    if (student && sess.scope === "class" && (student.form !== sess.form || student.stream !== sess.stream)) student = null;
+    var body;
+    if (student) {
+      if (!state.form) state.form = student.form;
+      if (!state.term) state.term = student.terms[student.terms.length - 1].term;
+      var panel = state.tab === "results" ? resultsBlock(student)
+        : state.tab === "progress" ? progressBlock(student)
+        : state.tab === "messages" ? "<article class='card'><h3>Message " + esc(student.guardian) + "</h3>" + messagePane(student, sess.staffId, sess) + "</article>"
+        : overviewBlock(student, sess);
+      body = "<p class='no-print'><button class='btn btn-ghost btn-small' type='button' data-action='back'>Back to students</button></p>"
+        + "<h2>" + esc(student.name) + "</h2><p class='who'>" + esc(student.adm) + " · Form " + student.form + " " + esc(student.stream) + "</p>"
+        + "<div class='tabs no-print'>" + tabButton("overview", "Overview", state.tab) + tabButton("results", "Results", state.tab) + tabButton("progress", "Entry to exit", state.tab) + tabButton("messages", "Message guardian", state.tab) + "</div>"
+        + panel;
+    } else if (state.tab === "messages") {
+      body = staffInbox(sess);
+    } else {
+      body = staffList(sess);
+    }
+    var unread = KBEST.unreadCount(sess);
+    shell("Staff portal", ""
+      + "<section class='wrap page'><div class='portal-head'><div><p class='kicker'>Staff portal</p><h1>" + esc(sess.name) + "</h1><p class='who'>" + esc(sess.roleLabel) + (sess.subject ? " · " + esc(sess.subject) : "") + "</p></div>"
+      + "<button class='btn btn-ghost no-print' type='button' data-action='logout'>Sign out</button></div>"
+      + "<div class='tabs no-print'>"
+      + tabButton("overview", sess.scope === "class" ? "My class" : "Register", state.studentAdm ? "student" : state.tab, "", true)
+      + tabButton("messages", "Inbox", state.studentAdm ? "student" : state.tab, unread ? " <span class='badge'>" + unread + "</span>" : "", true)
+      + "</div>" + body
+      + "<p class='no-print' style='margin-top:18px'><button class='btn btn-danger btn-small' type='button' data-action='reset'>Reset sample messages</button></p></section>");
+  }
+
+  function render() {
+    var current = route();
+    var sess = session();
+    if (current === "portal" && !sess) current = "login";
+    if (current === "home") homePage();
+    else if (current === "academics") academicsPage();
+    else if (current === "contact") contactPage();
+    else if (current === "login") loginPage();
+    else if (sess.kind === "parent") parentPortal(sess);
+    else staffPortal(sess);
+  }
+
+  function drawChart(canvas) {
+    var student = KBEST.studentByAdm(canvas.getAttribute("data-chart"));
+    if (!student) return;
+    var width = canvas.clientWidth || canvas.parentElement.clientWidth || 640;
+    if (width < 40) return;
+    var height = 240;
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.height = height + "px";
+    var ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, width, height);
+    var pad = { l: 42, r: 14, t: 16, b: 34 };
+    var plotW = width - pad.l - pad.r;
+    var plotH = height - pad.t - pad.b;
+    ctx.strokeStyle = "#e3d8c6";
+    ctx.fillStyle = "#4d5c53";
+    ctx.font = "12px Outfit, Segoe UI, sans-serif";
+    ctx.textAlign = "right";
+    [1, 4, 7, 10, 12].forEach(function (point) {
+      var y = pad.t + (12 - point) / 11 * plotH;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y);
+      ctx.lineTo(width - pad.r, y);
+      ctx.stroke();
+      ctx.fillText(String(point), pad.l - 8, y + 4);
+    });
+    var terms = student.terms;
+    function xAt(index) {
+      if (terms.length === 1) return pad.l + plotW / 2;
+      return pad.l + (index / (terms.length - 1)) * plotW;
+    }
+    function yAt(points) {
+      return pad.t + (12 - points) / 11 * plotH;
+    }
+    ctx.beginPath();
+    ctx.strokeStyle = "#0e3b2e";
+    ctx.lineWidth = 2.4;
+    terms.forEach(function (term, index) {
+      var x = xAt(index);
+      var y = yAt(term.meanPoints);
+      if (index === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    ctx.textAlign = "center";
+    terms.forEach(function (term, index) {
+      var x = xAt(index);
+      var y = yAt(term.meanPoints);
+      ctx.fillStyle = "#b8893d";
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#4d5c53";
+      if (width > 680 || index % 2 === 0) ctx.fillText(term.form + "." + term.term, x, height - 12);
+    });
+  }
+
+  document.body.addEventListener("click", function (event) {
+    var node = event.target.closest("[data-action]");
+    if (!node) return;
+    var action = node.getAttribute("data-action");
+    if (action === "nav") {
+      var open = nav.classList.toggle("open");
+      node.setAttribute("aria-expanded", open ? "true" : "false");
+      return;
+    }
+    if (action === "kind") {
+      state.loginKind = node.getAttribute("data-kind");
+      state.error = "";
+      render();
+      return;
+    }
+    if (action === "fill") {
+      state.loginKind = node.getAttribute("data-kind");
+      state.loginId = node.getAttribute("data-id");
+      state.loginPassword = KBEST.DEMO_PASSWORD;
+      state.error = "";
+      if (location.hash !== "#login") location.hash = "login";
+      else render();
+      return;
+    }
+    if (action === "logout") {
+      setSession(null);
+      state.studentAdm = "";
+      state.tab = "overview";
+      location.hash = "home";
+      return;
+    }
+    if (action === "tab") {
+      state.tab = node.getAttribute("data-tab");
+      state.notice = "";
+      if (node.getAttribute("data-root") === "1") state.studentAdm = "";
+      render();
+      return;
+    }
+    if (action === "form") {
+      state.form = Number(node.getAttribute("data-form"));
+      state.term = 1;
+      render();
+      return;
+    }
+    if (action === "term") {
+      state.term = Number(node.getAttribute("data-term"));
+      render();
+      return;
+    }
+    if (action === "print") {
+      window.print();
+      return;
+    }
+    if (action === "message-teacher") {
+      var currentStudent = studentOf(session());
+      state.tab = "messages";
+      state.channel = currentStudent ? currentStudent.teacherId : state.channel;
+      if (session() && session().kind === "staff") state.channel = session().staffId;
+      render();
+      return;
+    }
+    if (action === "channel") {
+      state.channel = node.getAttribute("data-channel");
+      state.notice = "";
+      render();
+      return;
+    }
+    if (action === "open-student") {
+      state.studentAdm = node.getAttribute("data-adm");
+      state.tab = "overview";
+      state.form = null;
+      state.term = null;
+      state.notice = "";
+      var opened = KBEST.studentByAdm(state.studentAdm);
+      state.channel = session().scope === "class" ? session().staffId : (opened ? opened.teacherId : "");
+      render();
+      return;
+    }
+    if (action === "thread") {
+      state.threadAdm = node.getAttribute("data-adm");
+      state.notice = "";
+      render();
+      return;
+    }
+    if (action === "back") {
+      state.studentAdm = "";
+      state.tab = "overview";
+      render();
+      return;
+    }
+    if (action === "reset") {
+      KBEST.resetMessages();
+      state.notice = "";
+      render();
+    }
+  });
+
+  document.body.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!(form instanceof HTMLFormElement)) return;
+    var action = form.getAttribute("data-action");
+    if (!action) return;
+    event.preventDefault();
+    if (action === "login") {
+      var result = KBEST.authenticate(state.loginKind, form.id.value, form.password.value);
+      if (result.error) {
+        state.error = result.error;
+        state.loginId = form.id.value;
+        state.loginPassword = form.password.value;
+        render();
+        return;
+      }
+      setSession(result.session);
+      state.error = "";
+      state.tab = "overview";
+      state.studentAdm = "";
+      state.form = null;
+      state.term = null;
+      state.channel = "";
+      if ((location.hash || "").replace(/^#\/?/, "") === "portal") render();
+      else location.hash = "portal";
+      return;
+    }
+    if (action === "send") {
+      var sess = session();
+      var data = new FormData(form);
+      var sent = KBEST.sendMessage({
+        studentAdm: data.get("adm"),
+        channel: data.get("channel"),
+        sender: sess.kind === "parent" ? "parent" : "staff",
+        senderName: sess.name,
+        topic: data.get("topic"),
+        body: data.get("body")
+      });
+      state.notice = sent.error || "";
+      if (!sent.error) state.threadAdm = data.get("adm");
+      render();
+    }
+  });
+
+  document.body.addEventListener("input", function (event) {
+    var node = event.target;
+    if (node.getAttribute && node.getAttribute("data-action") === "query") {
+      state.q = node.value;
+      var start = node.selectionStart;
+      render();
+      var again = app.querySelector("[data-action='query']");
+      if (again) {
+        again.focus();
+        if (start != null) again.setSelectionRange(start, start);
+      }
+    }
+  });
+
+  document.body.addEventListener("change", function (event) {
+    var node = event.target;
+    if (!node.getAttribute) return;
+    if (node.getAttribute("data-action") === "filter-form") {
+      state.filterForm = node.value;
+      render();
+    }
+    if (node.getAttribute("data-action") === "filter-stream") {
+      state.filterStream = node.value;
+      render();
+    }
+  });
+
+  document.body.addEventListener("click", function (event) {
+    if (event.target.closest("a[href^='#']")) nav.classList.remove("open");
+  });
+
+  window.addEventListener("hashchange", render);
+  window.addEventListener("resize", function () {
+    var canvas = app.querySelector("canvas[data-chart]");
+    if (canvas) drawChart(canvas);
+  });
+  render();
+})();
+
+  </script>
 </body>
 </html>
