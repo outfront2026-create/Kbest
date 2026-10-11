@@ -6,6 +6,7 @@
     loginId: "",
     loginPassword: "",
     error: "",
+    errorField: "",
     tab: "overview",
     form: null,
     term: null,
@@ -99,6 +100,46 @@
     paintNav();
     var canvas = app.querySelector("canvas[data-chart]");
     if (canvas) drawChart(canvas);
+    bindLogin();
+  }
+
+  function idLooksComplete(kind, value) {
+    var id = String(value || "").trim().toUpperCase();
+    if (kind === "parent") return /^KBEST-[1-4][NSWE]-\d{3}$/.test(id);
+    return /^(CT-[1-4][NSWE]|PRINCIPAL|DEPUTY|DEAN)$/.test(id);
+  }
+
+  function bindLogin() {
+    var form = app.querySelector("form[data-action='login']");
+    if (!form) return;
+    var id = form.querySelector("input[name='id']");
+    var password = form.querySelector("input[name='password']");
+    if (state.errorField === "password") password.focus();
+    else if (state.errorField === "id" || !id.value) id.focus();
+    else if (!password.value) password.focus();
+
+    id.addEventListener("input", function () {
+      var start = id.selectionStart;
+      var end = id.selectionEnd;
+      var next = id.value.toUpperCase();
+      if (next !== id.value) {
+        id.value = next;
+        try { id.setSelectionRange(start, end); } catch (err) { /* some mobile keyboards */ }
+      }
+      state.loginId = id.value;
+      if (idLooksComplete(state.loginKind, id.value) && !password.value.trim()) password.focus();
+    });
+    id.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      if (!id.value.trim()) return;
+      if (!password.value.trim()) password.focus();
+      else if (typeof form.requestSubmit === "function") form.requestSubmit();
+      else form.querySelector("button[type='submit']").click();
+    });
+    password.addEventListener("input", function () {
+      state.loginPassword = password.value;
+    });
   }
 
   function homePage() {
@@ -180,26 +221,41 @@
 
   function loginPage() {
     var kind = state.loginKind;
+    var idLabel = kind === "parent" ? "Admission number" : "Staff ID";
+    var idHint = kind === "parent" ? "Starts with a capital letter, for example KBEST-4N-001." : "Starts with a capital letter, for example CT-4N or PRINCIPAL.";
+    var fieldName = state.errorField === "password" ? "password" : state.errorField === "id" ? idLabel.toLowerCase() : "";
+    var idInvalid = state.errorField === "id";
+    var passwordInvalid = state.errorField === "password";
     shell("Sign in", ""
       + "<section class='wrap page login-layout'>"
       + "<div><p class='kicker'>Parent and teacher portal</p><h1>Sign in to KBEST</h1>"
-      + "<p class='lede'>Parents use the student’s admission number. Teachers use a staff ID. Results and messages open only after the details match the register.</p>"
+      + "<p class='lede'>Choose Parent or Teacher, then enter the first detail. The keyboard starts in capitals, and the form moves to the next empty field when that first detail is complete.</p>"
       + "<div class='note'>Sample password for every demonstration account: <strong>" + esc(KBEST.DEMO_PASSWORD) + "</strong>. You may also type the admission number or staff ID again as the password.</div>"
       + "<div class='chips'>"
       + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-4N-001'>Parent · KBEST-4N-001</button>"
       + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-2S-010'>Parent · KBEST-2S-010</button>"
-      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='CT-4N'>Class teacher · CT-4N</button>"
-      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='PRINCIPAL'>Principal</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='CT-4N'>Mr. Ngugi · CT-4N</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='PRINCIPAL'>Mr. Thiga · Principal</button>"
       + "</div></div>"
-      + "<form class='panel' data-action='login'>"
+      + "<form class='panel login-panel' data-action='login' novalidate>"
+      + "<h2>" + (kind === "parent" ? "Parent sign-in" : "Teacher sign-in") + "</h2>"
+      + "<p class='who'>" + (kind === "parent" ? "Use the student’s admission number." : "Use your staff ID.") + "</p>"
       + "<div class='seg'>"
       + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='parent' aria-pressed='" + (kind === "parent") + "'>Parent</button>"
       + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='staff' aria-pressed='" + (kind === "staff") + "'>Teacher</button>"
       + "</div>"
-      + (state.error ? "<p class='error' role='alert'>" + esc(state.error) + "</p>" : "")
-      + "<label>" + (kind === "parent" ? "Admission number" : "Staff ID")
-      + "<input name='id' autocomplete='username' required value='" + esc(state.loginId) + "' placeholder='" + (kind === "parent" ? "KBEST-4N-001" : "CT-4N") + "'></label>"
-      + "<label>Password<input name='password' type='password' autocomplete='current-password' required value='" + esc(state.loginPassword) + "'></label>"
+      + (state.error && fieldName ? "<p class='error' role='alert'>Error on the <strong>" + esc(fieldName) + "</strong> field. " + esc(state.error) + "</p>" : "")
+      + (state.error && !fieldName ? "<p class='error' role='alert'>" + esc(state.error) + "</p>" : "")
+      + "<label>" + idLabel
+      + "<input name='id' autocomplete='username' autocapitalize='characters' autocorrect='off' spellcheck='false' enterkeyhint='next' inputmode='text' required value='" + esc(state.loginId) + "' placeholder='" + (kind === "parent" ? "KBEST-4N-001" : "CT-4N") + "'" + (idInvalid ? " class='invalid' aria-invalid='true' aria-describedby='login-id-error'" : "") + ">"
+      + "<span class='field-hint'>" + idHint + "</span>"
+      + (idInvalid ? "<p class='field-error' id='login-id-error'>" + esc(state.error) + "</p>" : "")
+      + "</label>"
+      + "<label>Password"
+      + "<input name='password' type='password' autocomplete='current-password' autocapitalize='none' enterkeyhint='done' required value='" + esc(state.loginPassword) + "'" + (passwordInvalid ? " class='invalid' aria-invalid='true' aria-describedby='login-password-error'" : "") + ">"
+      + "<span class='field-hint'>After the first field is complete, this password field is selected automatically.</span>"
+      + (passwordInvalid ? "<p class='field-error' id='login-password-error'>" + esc(state.error) + "</p>" : "")
+      + "</label>"
       + "<button class='btn' type='submit'>Sign in</button>"
       + "</form></section>");
   }
@@ -255,7 +311,7 @@
       + "<div class='stat'><span>Conduct</span><strong>" + esc(selected.conduct) + "</strong></div>"
       + "<div class='stat'><span>Attendance</span><strong>" + selected.attendance.toFixed(1) + "%</strong></div></div>"
       + "<p><strong>Class teacher remark.</strong> " + esc(selected.remark) + "</p>"
-      + "<div class='signatures'><div>Class teacher<br>" + esc(student.teacherName) + "</div><div>Principal<br>Mr. Francis Murimi</div></div></article>";
+      + "<div class='signatures'><div>Class teacher<br>" + esc(student.teacherName) + "</div><div>Principal<br>Mr. Thiga</div></div></article>";
   }
 
   function progressBlock(student) {
@@ -496,14 +552,16 @@
     if (action === "kind") {
       state.loginKind = node.getAttribute("data-kind");
       state.error = "";
+      state.errorField = "";
       render();
       return;
     }
     if (action === "fill") {
       state.loginKind = node.getAttribute("data-kind");
       state.loginId = node.getAttribute("data-id");
-      state.loginPassword = KBEST.DEMO_PASSWORD;
+      state.loginPassword = "";
       state.error = "";
+      state.errorField = "";
       if (location.hash !== "#login") location.hash = "login";
       else render();
       return;
@@ -591,6 +649,7 @@
       var result = KBEST.authenticate(state.loginKind, form.id.value, form.password.value);
       if (result.error) {
         state.error = result.error;
+        state.errorField = result.field || "id";
         state.loginId = form.id.value;
         state.loginPassword = form.password.value;
         render();
@@ -598,6 +657,7 @@
       }
       setSession(result.session);
       state.error = "";
+      state.errorField = "";
       state.tab = "overview";
       state.studentAdm = "";
       state.form = null;

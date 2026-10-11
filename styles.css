@@ -259,12 +259,19 @@ th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; colo
 
 .login-layout {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 0.95fr 1.05fr;
   gap: 22px;
   align-items: start;
 }
 .panel { padding: 22px; }
+.login-panel {
+  border-top: 4px solid var(--gold);
+  padding: 26px 22px 22px;
+}
+.login-panel h2 { margin: 0 0 4px; font-size: 1.45rem; }
+.login-panel .who { margin-bottom: 8px; }
 label { display: block; font-weight: 600; margin: 12px 0; }
+.field-hint { display: block; font-weight: 500; color: var(--ink-soft); font-size: 0.86rem; margin: 4px 0 0; }
 input, select, textarea {
   width: 100%;
   margin-top: 6px;
@@ -272,6 +279,16 @@ input, select, textarea {
   border-radius: 12px;
   border: 1px solid #d9cdb8;
   background: #fff;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(29, 92, 69, 0.16);
+}
+input.invalid, select.invalid, textarea.invalid {
+  border-color: var(--danger);
+  background: #fff7f7;
+  box-shadow: 0 0 0 3px rgba(140, 47, 47, 0.12);
 }
 textarea { min-height: 120px; resize: vertical; }
 .seg { display: flex; gap: 8px; margin: 8px 0 4px; }
@@ -293,6 +310,13 @@ textarea { min-height: 120px; resize: vertical; }
   padding: 10px 12px;
   margin: 8px 0;
 }
+.field-error {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.login-panel .btn[type="submit"] { width: 100%; margin-top: 8px; }
 .note {
   background: #f7f1e4;
   border-radius: 12px;

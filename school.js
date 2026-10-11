@@ -26,8 +26,9 @@
     var teacher = api.authenticate("staff", "ct-4n", "CT-4N");
     var bad = api.authenticate("parent", "KBEST-4N-001", "wrong-password");
     if (!parent.session || parent.session.studentAdm !== "KBEST-4N-001") throw new Error("Parent login failed");
-    if (!teacher.session || teacher.session.staffId !== "CT-4N") throw new Error("Teacher login failed");
-    if (!bad.error) throw new Error("Bad password was accepted");
+    if (!teacher.session || teacher.session.staffId !== "CT-4N" || teacher.session.name !== "Mr. Ngugi") throw new Error("Teacher login failed");
+    if (!bad.error || bad.field !== "password") throw new Error("Bad password was accepted");
+    if (api.staffById("PRINCIPAL").name !== "Mr. Thiga") throw new Error("Principal name mismatch");
     Object.keys(counts).forEach(function (key) {
       if (counts[key] > 50) throw new Error(key + " has " + counts[key]);
     });
@@ -69,14 +70,14 @@
     "3S": { id: "CT-3S", name: "Ms. Lucy Muriithi", subject: "Agriculture", form: 3, stream: "South" },
     "3W": { id: "CT-3W", name: "Mr. Nicholas Wanjala", subject: "Business Studies", form: 3, stream: "West" },
     "3E": { id: "CT-3E", name: "Mr. Edwin Otieno", subject: "Computer Studies", form: 3, stream: "East" },
-    "4N": { id: "CT-4N", name: "Mr. Samuel Kariuki", subject: "Mathematics", form: 4, stream: "North" },
+    "4N": { id: "CT-4N", name: "Mr. Ngugi", subject: "Mathematics", form: 4, stream: "North" },
     "4S": { id: "CT-4S", name: "Ms. Ann Njiru", subject: "English", form: 4, stream: "South" },
     "4W": { id: "CT-4W", name: "Mr. Moses Mbaka", subject: "Chemistry", form: 4, stream: "West" },
     "4E": { id: "CT-4E", name: "Mr. Timothy Kivuti", subject: "Biology", form: 4, stream: "East" }
   };
 
   var LEADERSHIP = [
-    { id: "PRINCIPAL", name: "Mr. Francis Murimi", title: "Principal", scope: "school" },
+    { id: "PRINCIPAL", name: "Mr. Thiga", title: "Principal", scope: "school" },
     { id: "DEPUTY", name: "Mr. Daniel Mucira", title: "Deputy Principal, Academics", scope: "school" },
     { id: "DEAN", name: "Mr. Joseph Njue", title: "Dean of Students", scope: "school" }
   ];
@@ -387,13 +388,43 @@
 
   function authenticate(kind, id, password) {
     var clean = String(id || "").trim().toUpperCase();
-    if (!clean || !String(password || "").trim()) {
-      return { error: "Enter both the ID and the password." };
+    var secret = String(password || "").trim();
+    var looksAdm = /^KBEST-[1-4][NSWE]-\d{3}$/.test(clean);
+    var looksStaff = /^(CT-[1-4][NSWE]|PRINCIPAL|DEPUTY|DEAN)$/.test(clean);
+    if (!clean) {
+      return {
+        error: kind === "parent"
+          ? "The admission number field is empty. Enter the student’s number, for example KBEST-4N-001."
+          : "The staff ID field is empty. Enter a teacher ID, for example CT-4N.",
+        field: "id"
+      };
+    }
+    if (!secret) {
+      return {
+        error: "The password field is empty. Enter the password for this account.",
+        field: "password"
+      };
     }
     if (kind === "parent") {
+      if (looksStaff) {
+        return {
+          error: "That value is a staff ID. Open Teacher at the top of this form, or type the student’s admission number here.",
+          field: "id"
+        };
+      }
       var student = studentByAdm(clean);
-      if (!student) return { error: "That admission number is not on the KBEST register." };
-      if (!passwordOk(clean, password)) return { error: "The password does not match this admission number." };
+      if (!student) {
+        return {
+          error: "This admission number is not on the KBEST register. Check the number in this field.",
+          field: "id"
+        };
+      }
+      if (!passwordOk(clean, password)) {
+        return {
+          error: "The password in this field does not match admission number " + student.adm + ".",
+          field: "password"
+        };
+      }
       return {
         session: {
           kind: "parent",
@@ -403,9 +434,25 @@
         }
       };
     }
+    if (looksAdm) {
+      return {
+        error: "That value is a student’s admission number. Open Parent at the top of this form, or type a staff ID here.",
+        field: "id"
+      };
+    }
     var staff = staffById(clean);
-    if (!staff) return { error: "That staff ID is not on the KBEST directory." };
-    if (!passwordOk(clean, password)) return { error: "The password does not match this staff ID." };
+    if (!staff) {
+      return {
+        error: "This staff ID is not on the KBEST directory. Check the ID in this field.",
+        field: "id"
+      };
+    }
+    if (!passwordOk(clean, password)) {
+      return {
+        error: "The password in this field does not match staff ID " + staff.id + ".",
+        field: "password"
+      };
+    }
     return {
       session: {
         kind: "staff",
@@ -446,7 +493,7 @@
         sender: "parent",
         senderName: brian.guardian,
         topic: "Academic progress",
-        body: "Good evening, Mr. Kariuki. Kindly update us on how Brian is preparing for the KCSE practicals, and which papers need more time at home.",
+        body: "Good evening, Mr. Ngugi. Kindly update us on how Brian is preparing for the KCSE practicals, and which papers need more time at home.",
         at: "2026-09-28T16:10:00.000Z",
         readBy: ["parent"]
       },
@@ -455,7 +502,7 @@
         studentAdm: brian.adm,
         channel: "CT-4N",
         sender: "staff",
-        senderName: "Mr. Samuel Kariuki",
+        senderName: "Mr. Ngugi",
         topic: "Academic progress",
         body: "Thank you. Brian is steady in Mathematics and English. Chemistry practicals need more practice on titration and qualitative analysis. I have booked him into the Thursday clinic at 4.30pm. His latest midterm mean is on the portal.",
         at: "2026-09-29T07:40:00.000Z",
@@ -476,7 +523,7 @@
   }
 
   function loadMessages() {
-    var raw = store().getItem("kbest.messages.v1");
+      var raw = store().getItem("kbest.messages.v2");
     if (!raw) {
       var seeded = seedMessages();
       saveMessages(seeded);
@@ -491,7 +538,7 @@
   }
 
   function saveMessages(list) {
-    store().setItem("kbest.messages.v1", JSON.stringify(list));
+    store().setItem("kbest.messages.v2", JSON.stringify(list));
   }
 
   function resetMessages() {

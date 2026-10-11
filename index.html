@@ -272,12 +272,19 @@ th { font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; colo
 
 .login-layout {
   display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
+  grid-template-columns: 0.95fr 1.05fr;
   gap: 22px;
   align-items: start;
 }
 .panel { padding: 22px; }
+.login-panel {
+  border-top: 4px solid var(--gold);
+  padding: 26px 22px 22px;
+}
+.login-panel h2 { margin: 0 0 4px; font-size: 1.45rem; }
+.login-panel .who { margin-bottom: 8px; }
 label { display: block; font-weight: 600; margin: 12px 0; }
+.field-hint { display: block; font-weight: 500; color: var(--ink-soft); font-size: 0.86rem; margin: 4px 0 0; }
 input, select, textarea {
   width: 100%;
   margin-top: 6px;
@@ -285,6 +292,16 @@ input, select, textarea {
   border-radius: 12px;
   border: 1px solid #d9cdb8;
   background: #fff;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(29, 92, 69, 0.16);
+}
+input.invalid, select.invalid, textarea.invalid {
+  border-color: var(--danger);
+  background: #fff7f7;
+  box-shadow: 0 0 0 3px rgba(140, 47, 47, 0.12);
 }
 textarea { min-height: 120px; resize: vertical; }
 .seg { display: flex; gap: 8px; margin: 8px 0 4px; }
@@ -306,6 +323,13 @@ textarea { min-height: 120px; resize: vertical; }
   padding: 10px 12px;
   margin: 8px 0;
 }
+.field-error {
+  margin: 6px 0 0;
+  color: var(--danger);
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+.login-panel .btn[type="submit"] { width: 100%; margin-top: 8px; }
 .note {
   background: #f7f1e4;
   border-radius: 12px;
@@ -484,8 +508,9 @@ canvas.chart {
     var teacher = api.authenticate("staff", "ct-4n", "CT-4N");
     var bad = api.authenticate("parent", "KBEST-4N-001", "wrong-password");
     if (!parent.session || parent.session.studentAdm !== "KBEST-4N-001") throw new Error("Parent login failed");
-    if (!teacher.session || teacher.session.staffId !== "CT-4N") throw new Error("Teacher login failed");
-    if (!bad.error) throw new Error("Bad password was accepted");
+    if (!teacher.session || teacher.session.staffId !== "CT-4N" || teacher.session.name !== "Mr. Ngugi") throw new Error("Teacher login failed");
+    if (!bad.error || bad.field !== "password") throw new Error("Bad password was accepted");
+    if (api.staffById("PRINCIPAL").name !== "Mr. Thiga") throw new Error("Principal name mismatch");
     Object.keys(counts).forEach(function (key) {
       if (counts[key] > 50) throw new Error(key + " has " + counts[key]);
     });
@@ -527,14 +552,14 @@ canvas.chart {
     "3S": { id: "CT-3S", name: "Ms. Lucy Muriithi", subject: "Agriculture", form: 3, stream: "South" },
     "3W": { id: "CT-3W", name: "Mr. Nicholas Wanjala", subject: "Business Studies", form: 3, stream: "West" },
     "3E": { id: "CT-3E", name: "Mr. Edwin Otieno", subject: "Computer Studies", form: 3, stream: "East" },
-    "4N": { id: "CT-4N", name: "Mr. Samuel Kariuki", subject: "Mathematics", form: 4, stream: "North" },
+    "4N": { id: "CT-4N", name: "Mr. Ngugi", subject: "Mathematics", form: 4, stream: "North" },
     "4S": { id: "CT-4S", name: "Ms. Ann Njiru", subject: "English", form: 4, stream: "South" },
     "4W": { id: "CT-4W", name: "Mr. Moses Mbaka", subject: "Chemistry", form: 4, stream: "West" },
     "4E": { id: "CT-4E", name: "Mr. Timothy Kivuti", subject: "Biology", form: 4, stream: "East" }
   };
 
   var LEADERSHIP = [
-    { id: "PRINCIPAL", name: "Mr. Francis Murimi", title: "Principal", scope: "school" },
+    { id: "PRINCIPAL", name: "Mr. Thiga", title: "Principal", scope: "school" },
     { id: "DEPUTY", name: "Mr. Daniel Mucira", title: "Deputy Principal, Academics", scope: "school" },
     { id: "DEAN", name: "Mr. Joseph Njue", title: "Dean of Students", scope: "school" }
   ];
@@ -845,13 +870,43 @@ canvas.chart {
 
   function authenticate(kind, id, password) {
     var clean = String(id || "").trim().toUpperCase();
-    if (!clean || !String(password || "").trim()) {
-      return { error: "Enter both the ID and the password." };
+    var secret = String(password || "").trim();
+    var looksAdm = /^KBEST-[1-4][NSWE]-\d{3}$/.test(clean);
+    var looksStaff = /^(CT-[1-4][NSWE]|PRINCIPAL|DEPUTY|DEAN)$/.test(clean);
+    if (!clean) {
+      return {
+        error: kind === "parent"
+          ? "The admission number field is empty. Enter the student’s number, for example KBEST-4N-001."
+          : "The staff ID field is empty. Enter a teacher ID, for example CT-4N.",
+        field: "id"
+      };
+    }
+    if (!secret) {
+      return {
+        error: "The password field is empty. Enter the password for this account.",
+        field: "password"
+      };
     }
     if (kind === "parent") {
+      if (looksStaff) {
+        return {
+          error: "That value is a staff ID. Open Teacher at the top of this form, or type the student’s admission number here.",
+          field: "id"
+        };
+      }
       var student = studentByAdm(clean);
-      if (!student) return { error: "That admission number is not on the KBEST register." };
-      if (!passwordOk(clean, password)) return { error: "The password does not match this admission number." };
+      if (!student) {
+        return {
+          error: "This admission number is not on the KBEST register. Check the number in this field.",
+          field: "id"
+        };
+      }
+      if (!passwordOk(clean, password)) {
+        return {
+          error: "The password in this field does not match admission number " + student.adm + ".",
+          field: "password"
+        };
+      }
       return {
         session: {
           kind: "parent",
@@ -861,9 +916,25 @@ canvas.chart {
         }
       };
     }
+    if (looksAdm) {
+      return {
+        error: "That value is a student’s admission number. Open Parent at the top of this form, or type a staff ID here.",
+        field: "id"
+      };
+    }
     var staff = staffById(clean);
-    if (!staff) return { error: "That staff ID is not on the KBEST directory." };
-    if (!passwordOk(clean, password)) return { error: "The password does not match this staff ID." };
+    if (!staff) {
+      return {
+        error: "This staff ID is not on the KBEST directory. Check the ID in this field.",
+        field: "id"
+      };
+    }
+    if (!passwordOk(clean, password)) {
+      return {
+        error: "The password in this field does not match staff ID " + staff.id + ".",
+        field: "password"
+      };
+    }
     return {
       session: {
         kind: "staff",
@@ -904,7 +975,7 @@ canvas.chart {
         sender: "parent",
         senderName: brian.guardian,
         topic: "Academic progress",
-        body: "Good evening, Mr. Kariuki. Kindly update us on how Brian is preparing for the KCSE practicals, and which papers need more time at home.",
+        body: "Good evening, Mr. Ngugi. Kindly update us on how Brian is preparing for the KCSE practicals, and which papers need more time at home.",
         at: "2026-09-28T16:10:00.000Z",
         readBy: ["parent"]
       },
@@ -913,7 +984,7 @@ canvas.chart {
         studentAdm: brian.adm,
         channel: "CT-4N",
         sender: "staff",
-        senderName: "Mr. Samuel Kariuki",
+        senderName: "Mr. Ngugi",
         topic: "Academic progress",
         body: "Thank you. Brian is steady in Mathematics and English. Chemistry practicals need more practice on titration and qualitative analysis. I have booked him into the Thursday clinic at 4.30pm. His latest midterm mean is on the portal.",
         at: "2026-09-29T07:40:00.000Z",
@@ -934,7 +1005,7 @@ canvas.chart {
   }
 
   function loadMessages() {
-    var raw = store().getItem("kbest.messages.v1");
+      var raw = store().getItem("kbest.messages.v2");
     if (!raw) {
       var seeded = seedMessages();
       saveMessages(seeded);
@@ -949,7 +1020,7 @@ canvas.chart {
   }
 
   function saveMessages(list) {
-    store().setItem("kbest.messages.v1", JSON.stringify(list));
+    store().setItem("kbest.messages.v2", JSON.stringify(list));
   }
 
   function resetMessages() {
@@ -1134,6 +1205,7 @@ canvas.chart {
     loginId: "",
     loginPassword: "",
     error: "",
+    errorField: "",
     tab: "overview",
     form: null,
     term: null,
@@ -1227,6 +1299,46 @@ canvas.chart {
     paintNav();
     var canvas = app.querySelector("canvas[data-chart]");
     if (canvas) drawChart(canvas);
+    bindLogin();
+  }
+
+  function idLooksComplete(kind, value) {
+    var id = String(value || "").trim().toUpperCase();
+    if (kind === "parent") return /^KBEST-[1-4][NSWE]-\d{3}$/.test(id);
+    return /^(CT-[1-4][NSWE]|PRINCIPAL|DEPUTY|DEAN)$/.test(id);
+  }
+
+  function bindLogin() {
+    var form = app.querySelector("form[data-action='login']");
+    if (!form) return;
+    var id = form.querySelector("input[name='id']");
+    var password = form.querySelector("input[name='password']");
+    if (state.errorField === "password") password.focus();
+    else if (state.errorField === "id" || !id.value) id.focus();
+    else if (!password.value) password.focus();
+
+    id.addEventListener("input", function () {
+      var start = id.selectionStart;
+      var end = id.selectionEnd;
+      var next = id.value.toUpperCase();
+      if (next !== id.value) {
+        id.value = next;
+        try { id.setSelectionRange(start, end); } catch (err) { /* some mobile keyboards */ }
+      }
+      state.loginId = id.value;
+      if (idLooksComplete(state.loginKind, id.value) && !password.value.trim()) password.focus();
+    });
+    id.addEventListener("keydown", function (event) {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      if (!id.value.trim()) return;
+      if (!password.value.trim()) password.focus();
+      else if (typeof form.requestSubmit === "function") form.requestSubmit();
+      else form.querySelector("button[type='submit']").click();
+    });
+    password.addEventListener("input", function () {
+      state.loginPassword = password.value;
+    });
   }
 
   function homePage() {
@@ -1308,26 +1420,41 @@ canvas.chart {
 
   function loginPage() {
     var kind = state.loginKind;
+    var idLabel = kind === "parent" ? "Admission number" : "Staff ID";
+    var idHint = kind === "parent" ? "Starts with a capital letter, for example KBEST-4N-001." : "Starts with a capital letter, for example CT-4N or PRINCIPAL.";
+    var fieldName = state.errorField === "password" ? "password" : state.errorField === "id" ? idLabel.toLowerCase() : "";
+    var idInvalid = state.errorField === "id";
+    var passwordInvalid = state.errorField === "password";
     shell("Sign in", ""
       + "<section class='wrap page login-layout'>"
       + "<div><p class='kicker'>Parent and teacher portal</p><h1>Sign in to KBEST</h1>"
-      + "<p class='lede'>Parents use the student’s admission number. Teachers use a staff ID. Results and messages open only after the details match the register.</p>"
+      + "<p class='lede'>Choose Parent or Teacher, then enter the first detail. The keyboard starts in capitals, and the form moves to the next empty field when that first detail is complete.</p>"
       + "<div class='note'>Sample password for every demonstration account: <strong>" + esc(KBEST.DEMO_PASSWORD) + "</strong>. You may also type the admission number or staff ID again as the password.</div>"
       + "<div class='chips'>"
       + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-4N-001'>Parent · KBEST-4N-001</button>"
       + "<button class='chip' type='button' data-action='fill' data-kind='parent' data-id='KBEST-2S-010'>Parent · KBEST-2S-010</button>"
-      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='CT-4N'>Class teacher · CT-4N</button>"
-      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='PRINCIPAL'>Principal</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='CT-4N'>Mr. Ngugi · CT-4N</button>"
+      + "<button class='chip' type='button' data-action='fill' data-kind='staff' data-id='PRINCIPAL'>Mr. Thiga · Principal</button>"
       + "</div></div>"
-      + "<form class='panel' data-action='login'>"
+      + "<form class='panel login-panel' data-action='login' novalidate>"
+      + "<h2>" + (kind === "parent" ? "Parent sign-in" : "Teacher sign-in") + "</h2>"
+      + "<p class='who'>" + (kind === "parent" ? "Use the student’s admission number." : "Use your staff ID.") + "</p>"
       + "<div class='seg'>"
       + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='parent' aria-pressed='" + (kind === "parent") + "'>Parent</button>"
       + "<button class='btn btn-ghost' type='button' data-action='kind' data-kind='staff' aria-pressed='" + (kind === "staff") + "'>Teacher</button>"
       + "</div>"
-      + (state.error ? "<p class='error' role='alert'>" + esc(state.error) + "</p>" : "")
-      + "<label>" + (kind === "parent" ? "Admission number" : "Staff ID")
-      + "<input name='id' autocomplete='username' required value='" + esc(state.loginId) + "' placeholder='" + (kind === "parent" ? "KBEST-4N-001" : "CT-4N") + "'></label>"
-      + "<label>Password<input name='password' type='password' autocomplete='current-password' required value='" + esc(state.loginPassword) + "'></label>"
+      + (state.error && fieldName ? "<p class='error' role='alert'>Error on the <strong>" + esc(fieldName) + "</strong> field. " + esc(state.error) + "</p>" : "")
+      + (state.error && !fieldName ? "<p class='error' role='alert'>" + esc(state.error) + "</p>" : "")
+      + "<label>" + idLabel
+      + "<input name='id' autocomplete='username' autocapitalize='characters' autocorrect='off' spellcheck='false' enterkeyhint='next' inputmode='text' required value='" + esc(state.loginId) + "' placeholder='" + (kind === "parent" ? "KBEST-4N-001" : "CT-4N") + "'" + (idInvalid ? " class='invalid' aria-invalid='true' aria-describedby='login-id-error'" : "") + ">"
+      + "<span class='field-hint'>" + idHint + "</span>"
+      + (idInvalid ? "<p class='field-error' id='login-id-error'>" + esc(state.error) + "</p>" : "")
+      + "</label>"
+      + "<label>Password"
+      + "<input name='password' type='password' autocomplete='current-password' autocapitalize='none' enterkeyhint='done' required value='" + esc(state.loginPassword) + "'" + (passwordInvalid ? " class='invalid' aria-invalid='true' aria-describedby='login-password-error'" : "") + ">"
+      + "<span class='field-hint'>After the first field is complete, this password field is selected automatically.</span>"
+      + (passwordInvalid ? "<p class='field-error' id='login-password-error'>" + esc(state.error) + "</p>" : "")
+      + "</label>"
       + "<button class='btn' type='submit'>Sign in</button>"
       + "</form></section>");
   }
@@ -1383,7 +1510,7 @@ canvas.chart {
       + "<div class='stat'><span>Conduct</span><strong>" + esc(selected.conduct) + "</strong></div>"
       + "<div class='stat'><span>Attendance</span><strong>" + selected.attendance.toFixed(1) + "%</strong></div></div>"
       + "<p><strong>Class teacher remark.</strong> " + esc(selected.remark) + "</p>"
-      + "<div class='signatures'><div>Class teacher<br>" + esc(student.teacherName) + "</div><div>Principal<br>Mr. Francis Murimi</div></div></article>";
+      + "<div class='signatures'><div>Class teacher<br>" + esc(student.teacherName) + "</div><div>Principal<br>Mr. Thiga</div></div></article>";
   }
 
   function progressBlock(student) {
@@ -1624,14 +1751,16 @@ canvas.chart {
     if (action === "kind") {
       state.loginKind = node.getAttribute("data-kind");
       state.error = "";
+      state.errorField = "";
       render();
       return;
     }
     if (action === "fill") {
       state.loginKind = node.getAttribute("data-kind");
       state.loginId = node.getAttribute("data-id");
-      state.loginPassword = KBEST.DEMO_PASSWORD;
+      state.loginPassword = "";
       state.error = "";
+      state.errorField = "";
       if (location.hash !== "#login") location.hash = "login";
       else render();
       return;
@@ -1719,6 +1848,7 @@ canvas.chart {
       var result = KBEST.authenticate(state.loginKind, form.id.value, form.password.value);
       if (result.error) {
         state.error = result.error;
+        state.errorField = result.field || "id";
         state.loginId = form.id.value;
         state.loginPassword = form.password.value;
         render();
@@ -1726,6 +1856,7 @@ canvas.chart {
       }
       setSession(result.session);
       state.error = "";
+      state.errorField = "";
       state.tab = "overview";
       state.studentAdm = "";
       state.form = null;

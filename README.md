@@ -1,6 +1,6 @@
 # KBEST — Kanyuambora Boys High School
 
-Parent and teacher portal for results (Form 1 to Form 4), progress from entry to exit, and messages between guardians and teachers. The site is plain HTML, CSS, and JavaScript. It runs on GitHub Pages with no build step and no server.
+Parent and teacher portal for results (Form 1 to Form 4), progress from entry to exit, and messages between guardians and teachers. The site is one page, `index.html`. The design and the portal are inside that file, so GitHub Pages still shows the school site if the `css` or `js` folders were not uploaded. It runs with no build step and no server.
 
 ## Publish on GitHub Pages
 
